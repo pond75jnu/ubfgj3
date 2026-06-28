@@ -39,10 +39,6 @@ App_Data/*.ldf
 # Logs
 *.log
 
-# Exclude markdown files, but keep README.md
-*.md
-!README.md
-!readme.md
 
 # Exclude precompiled web output
 PrecompiledWeb/
