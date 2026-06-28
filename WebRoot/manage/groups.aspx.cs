@@ -200,6 +200,12 @@ public partial class manage_groups : System.Web.UI.Page
             DataSet ds1 = EfStoredProcedure.ExecuteDataSet(
                 "ubfgj3.dbo.SP_manage_group_duplicate_sel",
                 new SqlParameter("@BelongNm", belongNm),
+                new SqlParameter("@Retreat", SqlDbType.Int)
+                {
+                    Value = seq.Equals(string.Empty)
+                        ? (object)Convert.ToInt32(ddl_retreat.SelectedValue)
+                        : DBNull.Value
+                },
                 new SqlParameter("@Seq", SqlDbType.Int) { Value = seq.Equals(string.Empty) ? (object)DBNull.Value : Convert.ToInt32(seq) });
 
             if (ds1.Tables[0].Rows.Count > 0)
@@ -283,4 +289,3 @@ public partial class manage_groups : System.Web.UI.Page
     }
 
 }
-
