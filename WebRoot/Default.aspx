@@ -12,7 +12,7 @@
                 <p id="mDesc" runat="server" class="site-home-desc"></p>
                 <asp:Button ID="btnFileDown" runat="server" Text="프로그램 세부보기" CssClass="site-home-button" OnClick="btnFileDown_Click" />
             </div>
-            <div class="site-home-hero-label">UBF 광주3부 수양회 관리 프로그램</div>
+            <div class="site-home-hero-label">UBF 광주 3부 수양회 관리 프로그램</div>
         </div>
 
         <div class="site-home-cards">
