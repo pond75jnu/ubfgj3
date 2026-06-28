@@ -2,8 +2,6 @@
 
 이 프로젝트는 `UBF 광주 3부` 단체의 수양회 정보, 참석자, 회비 납부, 수입·지출, 회원 권한을 관리하는 ASP.NET Web Forms 웹사이트이다. Visual Studio Web Site 방식으로 구성되어 있어 `.csproj` 없이 `.aspx`, `.aspx.cs`, `App_Code`, `Web.config`를 IIS/IIS Express가 직접 컴파일한다.
 
-이 문서는 현재 소스(`C:\MyApps\ubfgj3.kr`)를 기준으로 작성했다.
-
 ## 빠른 파악
 
 - 기술 스택: ASP.NET Web Forms, C#, .NET Framework 4.x, Forms Authentication, ASP.NET Membership/Role Provider, SQL Server
