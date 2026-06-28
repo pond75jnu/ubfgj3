@@ -53,7 +53,7 @@ PrecompiledWeb/
 **/.git/
 
 # _attatch folder
-_attatch/*
-!_attatch/.gitkeep
+WebRoot/_attatch/*
+!WebRoot/_attatch/.gitkeep
 
 appsettings.json
