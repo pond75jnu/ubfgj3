@@ -80,51 +80,8 @@ public partial class staff_registatus_excel_export : System.Web.UI.Page
 
         if (ds.Tables[0].Rows.Count > 0)
         {
-            gvExcel.DataSource = ds;
-            gvExcel.DataBind();
-
-            Response.Clear();
-            Response.Buffer = true;
-            Response.ClearContent();
-            Response.ClearHeaders();
-            Response.Charset = "utf-8";
-
-            if (Request.UserAgent.ToString().ToLower().Contains("windows nt"))
-            {
-                Response.Charset = "euc-kr";
-                Response.ContentEncoding = Encoding.GetEncoding("euc-kr");
-            }                
-            else
-            {
-                Response.Charset = "utf-8";
-                Response.ContentEncoding = Encoding.GetEncoding("utf-8");
-            }
-
-            string FileName = "RegistListReport_" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".xls";
-            StringWriter swriter = new StringWriter();
-            HtmlTextWriter htwriter = new HtmlTextWriter(swriter);
-
-            Response.Cache.SetCacheability(HttpCacheability.NoCache);
-            Response.ContentType = "application/vnd.ms-excel";            
-            Response.AddHeader("content-disposition", "attachment;filename=" + HttpUtility.UrlEncode(FileName, new UTF8Encoding()));            
-
-            gvExcel.GridLines = GridLines.Both;
-            gvExcel.HeaderStyle.Font.Bold = true;
-
-            //gvExcel.RenderControl(htwriter);
-            
-            gvExcel.RenderBeginTag(htwriter);
-            gvExcel.HeaderRow.RenderControl(htwriter);
-            foreach (GridViewRow row in gvExcel.Rows)
-            {
-                row.RenderControl(htwriter);
-            }
-            gvExcel.FooterRow.RenderControl(htwriter);
-            gvExcel.RenderEndTag(htwriter);
-
-
-            Response.Write(swriter.ToString());
-            Response.End();
+            string FileName = "RegistListReport_" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".xlsx";
+            XlsxExportHelper.WriteDataTableToResponse(Response, ds.Tables[0], FileName, "등록현황");
         }
     }
 

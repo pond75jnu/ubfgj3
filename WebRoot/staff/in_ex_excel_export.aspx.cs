@@ -75,58 +75,21 @@ public partial class staff_in_ex_excel_export : System.Web.UI.Page
 
         if (ds.Tables[0].Rows.Count > 0)
         {
-            gvExcel.DataSource = ds;
-            gvExcel.DataBind();
-
-            Response.Clear();
-            Response.Buffer = true;
-            Response.ClearContent();
-            Response.ClearHeaders();
-
-
-            if (Request.UserAgent.ToString().ToLower().Contains("windows nt"))
-            {
-                Response.Charset = "euc-kr";
-                Response.ContentEncoding = Encoding.GetEncoding("euc-kr");
-            }                
-            else
-            {
-                Response.Charset = "utf-8";
-                Response.ContentEncoding = Encoding.GetEncoding("utf-8");
-            }
-                
-
             string FileName = string.Empty;
-            if (hdType.Value.Equals("1"))
-                FileName = "ExpensesReport_" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".xls";
-            else
-                FileName = "IncomesReport_" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".xls";
+            string sheetName = string.Empty;
 
-            
-            StringWriter swriter = new StringWriter();
-            HtmlTextWriter htwriter = new HtmlTextWriter(swriter);
-
-            Response.Cache.SetCacheability(HttpCacheability.NoCache);
-            Response.ContentType = "application/vnd.ms-excel";
-            Response.AddHeader("content-disposition", "attachment;filename=" + HttpUtility.UrlEncode(FileName, new UTF8Encoding()));
-
-            gvExcel.GridLines = GridLines.Both;
-            gvExcel.HeaderStyle.Font.Bold = true;
-
-            //gvExcel.RenderControl(htwriter);
-
-            gvExcel.RenderBeginTag(htwriter);
-            gvExcel.HeaderRow.RenderControl(htwriter);
-            foreach (GridViewRow row in gvExcel.Rows)
+            if (hdType.Value.Equals("2"))
             {
-                row.RenderControl(htwriter);
+                FileName = "ExpensesReport_" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".xlsx";
+                sheetName = "지출현황";
             }
-            gvExcel.FooterRow.RenderControl(htwriter);
-            gvExcel.RenderEndTag(htwriter);
+            else
+            {
+                FileName = "IncomesReport_" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".xlsx";
+                sheetName = "수입현황";
+            }
 
-
-            Response.Write(swriter.ToString());
-            Response.End();
+            XlsxExportHelper.WriteDataTableToResponse(Response, ds.Tables[0], FileName, sheetName);
         }
     }
     #endregion

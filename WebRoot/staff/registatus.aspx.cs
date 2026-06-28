@@ -249,7 +249,7 @@ public partial class staff_registatus : System.Web.UI.Page
 
         decimal total = completeTotal + partialTotal;
 
-        divRegistFeeSummary.InnerHtml = "&nbsp;&nbsp;📋&nbsp;<strong>총 등록비 " + FormatWon(total) + "</strong>"
+        divRegistFeeSummary.InnerHtml = "📋&nbsp;<strong>총 등록비 " + FormatWon(total) + "</strong>"
             + "<span class=\"text-[#333333]\">(완전등록 " + FormatWon(completeTotal)
             + " / 부분등록 " + FormatWon(partialTotal) + ")</span>";
     }
