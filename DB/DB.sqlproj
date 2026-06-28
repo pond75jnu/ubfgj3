@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>DB</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{a30c6af0-d752-4084-9878-ee43de904b63}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql170DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>DB</RootNamespace>
+    <AssemblyName>DB</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="StoredProcedure" />
+    <None Include="StoredProcedure\All_SP_LIST.sql" />
+    <None Include="StoredProcedure\SP_group_all_list_sel.sql" />
+    <None Include="StoredProcedure\SP_group_get_previous_by_name.sql" />
+    <None Include="StoredProcedure\SP_group_member_save.sql" />
+    <None Include="StoredProcedure\SP_group_members_delete_by_group.sql" />
+    <None Include="StoredProcedure\SP_group_members_delete_missing.sql" />
+    <None Include="StoredProcedure\SP_group_members_get_by_retreat_belong.sql" />
+    <None Include="StoredProcedure\SP_group_members_get_for_usermanage.sql" />
+    <None Include="StoredProcedure\SP_group_members_migrate.sql" />
+    <None Include="StoredProcedure\SP_group_name_sel.sql" />
+    <None Include="StoredProcedure\SP_group_retreat_list_sel.sql" />
+    <None Include="StoredProcedure\SP_group_seq_by_name_sel.sql" />
+    <None Include="StoredProcedure\SP_group_seq_match_sel.sql" />
+    <None Include="StoredProcedure\SP_groups_get_active_by_retreat.sql" />
+    <None Include="StoredProcedure\SP_income_summary_sel.sql" />
+    <None Include="StoredProcedure\SP_manage_group_del.sql" />
+    <None Include="StoredProcedure\SP_manage_group_detail_sel.sql" />
+    <None Include="StoredProcedure\SP_manage_group_duplicate_sel.sql" />
+    <None Include="StoredProcedure\SP_manage_group_ins.sql" />
+    <None Include="StoredProcedure\SP_manage_group_list_sel.sql" />
+    <None Include="StoredProcedure\SP_manage_group_upd.sql" />
+    <None Include="StoredProcedure\SP_manage_member_del.sql" />
+    <None Include="StoredProcedure\SP_manage_member_list_sel.sql" />
+    <None Include="StoredProcedure\SP_manage_member_password_unlock_upd.sql" />
+    <None Include="StoredProcedure\SP_manage_member_upd.sql" />
+    <None Include="StoredProcedure\SP_manage_retreat_recent_sel.sql" />
+    <None Include="StoredProcedure\SP_member_belong_upd.sql" />
+    <None Include="StoredProcedure\SP_member_chk_id_sel.sql" />
+    <None Include="StoredProcedure\SP_member_detail_sel.sql" />
+    <None Include="StoredProcedure\SP_member_email_duplicate_sel.sql" />
+    <None Include="StoredProcedure\SP_member_find_id_sel.sql" />
+    <None Include="StoredProcedure\SP_member_join_email_check_sel.sql" />
+    <None Include="StoredProcedure\SP_member_join_group_list_sel.sql" />
+    <None Include="StoredProcedure\SP_member_master_by_login_sel.sql" />
+    <None Include="StoredProcedure\SP_member_master_ins.sql" />
+    <None Include="StoredProcedure\SP_member_password_question_sel.sql" />
+    <None Include="StoredProcedure\SP_member_profile_upd.sql" />
+    <None Include="StoredProcedure\SP_menu_auth_by_path_sel.sql" />
+    <None Include="StoredProcedure\SP_menu_breadcrumb_current_sel.sql" />
+    <None Include="StoredProcedure\SP_menu_by_seq_sel.sql" />
+    <None Include="StoredProcedure\SP_menu_left_by_path_auth_sel.sql" />
+    <None Include="StoredProcedure\SP_menu_page_title_sel.sql" />
+    <None Include="StoredProcedure\SP_menu_top_nav_child_sel.sql" />
+    <None Include="StoredProcedure\SP_menu_top_nav_parent_sel.sql" />
+    <None Include="StoredProcedure\SP_payment_expenses_summary_sel.sql" />
+    <None Include="StoredProcedure\SP_payment_master_by_seq_sel.sql" />
+    <None Include="StoredProcedure\SP_payment_print_detail_get.sql" />
+    <None Include="StoredProcedure\SP_regist_info_sel.sql" />
+    <None Include="StoredProcedure\SP_registatus_confirm_update.sql" />
+    <None Include="StoredProcedure\SP_registatus_excel_get_list.sql" />
+    <None Include="StoredProcedure\SP_registatus_get_list.sql" />
+    <None Include="StoredProcedure\SP_retreat_active_file_sel.sql" />
+    <None Include="StoredProcedure\SP_retreat_active_get.sql" />
+    <None Include="StoredProcedure\SP_retreat_active_info_sel.sql" />
+    <None Include="StoredProcedure\SP_retreat_active_other_check.sql" />
+    <None Include="StoredProcedure\SP_retreat_current_code_sel.sql" />
+    <None Include="StoredProcedure\SP_retreat_delete_dependency_check.sql" />
+    <None Include="StoredProcedure\SP_retreat_dues_by_retreat_sel.sql" />
+    <None Include="StoredProcedure\SP_retreat_file_get.sql" />
+    <None Include="StoredProcedure\SP_retreat_get_detail.sql" />
+    <None Include="StoredProcedure\SP_retreat_get_list.sql" />
+    <None Include="StoredProcedure\SP_retreat_get_previous.sql" />
+    <None Include="StoredProcedure\SP_retreat_name_duplicate_check.sql" />
+    <None Include="StoredProcedure\SP_retreat_set_only_active.sql" />
+    <None Include="StoredProcedure\SP_retreatdues_get_list.sql" />
+    <None Include="StoredProcedure\SP_staff_cash_item_delete.sql" />
+    <None Include="StoredProcedure\SP_staff_cash_item_get_detail.sql" />
+    <None Include="StoredProcedure\SP_staff_cash_item_get_list.sql" />
+    <None Include="StoredProcedure\SP_staff_cash_item_get_options.sql" />
+    <None Include="StoredProcedure\SP_staff_cash_item_has_payments.sql" />
+    <None Include="StoredProcedure\SP_staff_cash_item_insert.sql" />
+    <None Include="StoredProcedure\SP_staff_cash_item_update.sql" />
+    <None Include="StoredProcedure\SP_staff_payment_delete.sql" />
+    <None Include="StoredProcedure\SP_staff_payment_get_detail.sql" />
+    <None Include="StoredProcedure\SP_staff_payment_get_list.sql" />
+    <None Include="StoredProcedure\SP_staff_payment_insert.sql" />
+    <None Include="StoredProcedure\SP_staff_payment_update.sql" />
+    <None Include="StoredProcedure\SP_staff_retreat_get_list.sql" />
+    <None Include="StoredProcedure\SP_staff_retreatdues_delete.sql" />
+    <None Include="StoredProcedure\SP_staff_retreatdues_get_detail.sql" />
+    <None Include="StoredProcedure\SP_staff_retreatdues_get_list.sql" />
+    <None Include="StoredProcedure\SP_staff_retreatdues_has_members.sql" />
+    <None Include="StoredProcedure\SP_staff_retreatdues_insert.sql" />
+    <None Include="StoredProcedure\SP_staff_retreatdues_update.sql" />
+    <None Include="StoredProcedure\SP_status_attend_get_members.sql" />
+    <None Include="StoredProcedure\SP_status_group_targets.sql" />
+    <None Include="StoredProcedure\SP_status_regist_get_members.sql" />
+    <None Include="StoredProcedure\SP_userinfo_role_by_userid_sel.sql" />
+    <None Include="StoredProcedure\SP_userinfo_roleid_sel.sql" />
+    <None Include="StoredProcedure\SP_userinfo_userid_sel.sql" />
+  </ItemGroup>
+</Project>

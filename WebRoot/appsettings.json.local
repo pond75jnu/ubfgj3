@@ -1,0 +1,17 @@
+﻿{
+  "ConnectionStrings": {
+    "RetreatConnectionString": {
+      "ConnectionString": "Data Source=sql19-003.cafe24.com;Initial Catalog=ubfgj3;User ID=ubfgj3;Password=######;Timeout=3600",
+      "ProviderName": "System.Data.SqlClient"
+    }
+  },
+  "Smtp": {
+    "From": "jnudeveloper@naver.com",
+    "Host": "smtp.naver.com",
+    "Port": 587,
+    "UserName": "jnudeveloper@naver.com",
+    "Password": "######",
+    "EnableSsl": true,
+    "DefaultCredentials": false
+  }
+}

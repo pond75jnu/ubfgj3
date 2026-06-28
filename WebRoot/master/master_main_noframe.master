@@ -1,0 +1,36 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="master_main_noframe.master.cs" Inherits="master_master_main_noframe" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UBF광주3부-수양회관리</title>
+    <link rel="stylesheet" href="/common/css/jquery-ui.1.13.1.css" />
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov-dynamic-subset.min.css" />
+    <link rel="stylesheet" href="/common/css/tailwind.css?v=tailwind-02" />
+    <link rel="stylesheet" href="/common/css/custom.css?v=tailwind-36" />
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+
+    </asp:ContentPlaceHolder>
+
+
+</head>
+<body>
+    <form id="form1" runat="server">
+        <main>            
+            
+        <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+        </asp:ContentPlaceHolder>
+
+        <script src="/common/js/jquery-3.6.0.min.js"></script>
+        <script src="/Common/js/jquery-ui-1.13.1.min.js"></script>
+        <script src="/common/js/custom.js?v=tailwind-01"></script>
+
+        </main>
+
+    </form>
+</body>
+</html>

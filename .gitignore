@@ -1,0 +1,59 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+bin/
+obj/
+Debug/
+Release/
+x64/
+x86/
+
+
+# ✅ Exception: track ubfgj3.kr WebRoot/bin dlls (required for CI precompile)
+!WebRoot/bin/
+!WebRoot/bin/**
+!WebRoot/Bin/
+!WebRoot/Bin/**
+
+# Packages (NuGet)
+packages/
+
+# ASP.NET
+App_Data/*.mdf
+App_Data/*.ldf
+
+# ✅ SSDT / Database project artifacts (DB.sqlproj)
+*.dbmdl
+*.jfm
+*.dbproj.user
+*.sqlproj.user
+
+# IIS Express
+*.applicationhost.config
+
+# Logs
+*.log
+
+# Exclude markdown files, but keep README.md
+*.md
+!README.md
+!readme.md
+
+# Exclude precompiled web output
+PrecompiledWeb/
+
+
+# Never track git metadata dirs (defensive)
+.git/
+**/.git/
+
+# _attatch folder
+_attatch/*
+!_attatch/.gitkeep
+
+appsettings.json
