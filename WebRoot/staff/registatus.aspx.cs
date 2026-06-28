@@ -5,6 +5,7 @@ using System.Web.UI.WebControls;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using System.Globalization;
 
 public partial class staff_registatus : System.Web.UI.Page
 {
@@ -197,6 +198,8 @@ public partial class staff_registatus : System.Web.UI.Page
             lvItems.DataSource = ds;
             lvItems.DataBind();
 
+            BindRegistFeeSummary(ds.Tables[0]);
+
             if (ds.Tables[0].Rows.Count > 0)
             {
                 int _upt_yn_cnt = 0;
@@ -226,6 +229,34 @@ public partial class staff_registatus : System.Web.UI.Page
         {
             Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "Alert", "<script>alert('등록현황 조회 중 에러 발생 : " + Server.HtmlEncode(ex.Message) + @"');</script>");
         }
+    }
+
+    protected void BindRegistFeeSummary(DataTable table)
+    {
+        decimal completeTotal = 0;
+        decimal partialTotal = 0;
+
+        foreach (DataRow row in table.Rows)
+        {
+            decimal userDues = row["user_dues"] == DBNull.Value ? 0 : Convert.ToDecimal(row["user_dues"]);
+            string registStatus = row["regi_status_nm"].ToString();
+
+            if (registStatus.Equals("완전등록"))
+                completeTotal += userDues;
+            else if (registStatus.Equals("부분등록"))
+                partialTotal += userDues;
+        }
+
+        decimal total = completeTotal + partialTotal;
+
+        divRegistFeeSummary.InnerHtml = "&nbsp;&nbsp;📋&nbsp;<strong>총 등록비 " + FormatWon(total) + "</strong>"
+            + "<span class=\"text-[#333333]\">(완전등록 " + FormatWon(completeTotal)
+            + " / 부분등록 " + FormatWon(partialTotal) + ")</span>";
+    }
+
+    protected string FormatWon(decimal amount)
+    {
+        return string.Format(CultureInfo.InvariantCulture, "{0:#,##0}원", amount);
     }
 
     protected void listView_ItemDataBound(object sender, ListViewItemEventArgs e)
