@@ -454,8 +454,16 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    DELETE FROM ubfgj3.dbo.[groups]
-     WHERE seq = @Seq;
+    DELETE A
+      FROM ubfgj3.dbo.[groups] A
+     WHERE A.seq = @Seq
+       AND NOT EXISTS
+           (
+               SELECT 1
+                 FROM ubfgj3.dbo.group_members B
+                INNER JOIN ubfgj3.dbo.[groups] C ON C.seq = B.belong
+                WHERE C.belong_nm = A.belong_nm
+           );
 END
 GO
 
@@ -470,9 +478,20 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT seq, belong_nm, manager, ISNULL(etc1, 'N') AS use_yn
-      FROM ubfgj3.dbo.[groups]
-     WHERE seq = @Seq;
+    SELECT A.seq,
+           A.belong_nm,
+           A.manager,
+           ISNULL(A.etc1, 'N') AS use_yn,
+           CASE WHEN EXISTS
+                     (
+                         SELECT 1
+                           FROM ubfgj3.dbo.group_members B
+                          INNER JOIN ubfgj3.dbo.[groups] C ON C.seq = B.belong
+                          WHERE C.belong_nm = A.belong_nm
+                     )
+                THEN 'N' ELSE 'Y' END AS can_delete
+      FROM ubfgj3.dbo.[groups] A
+     WHERE A.seq = @Seq;
 END
 GO
 
@@ -588,8 +607,7 @@ BEGIN
     SET NOCOUNT ON;
 
     UPDATE ubfgj3.dbo.[groups]
-       SET belong_nm = @BelongNm,
-           manager = @Manager,
+       SET manager = @Manager,
            etc1 = @UseYn,
            upt_id = @LoginId,
            upt_ip = @UserIp,

@@ -10,8 +10,7 @@ BEGIN
     SET NOCOUNT ON;
 
     UPDATE ubfgj3.dbo.[groups]
-       SET belong_nm = @BelongNm,
-           manager = @Manager,
+       SET manager = @Manager,
            etc1 = @UseYn,
            upt_id = @LoginId,
            upt_ip = @UserIp,

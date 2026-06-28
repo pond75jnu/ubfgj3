@@ -65,6 +65,7 @@ public partial class manage_groups : System.Web.UI.Page
             case "LIST":                
                 divList.Visible = true;
                 divWriteModify.Visible = false;
+                txtBelong.ReadOnly = false;
 
                 GetList();
 
@@ -79,6 +80,7 @@ public partial class manage_groups : System.Web.UI.Page
             case "WRITE":                
                 divList.Visible = false;
                 divWriteModify.Visible = true;
+                txtBelong.ReadOnly = false;
 
                 btnNew.Visible = false;
                 btnModify.Visible = false;
@@ -92,20 +94,22 @@ public partial class manage_groups : System.Web.UI.Page
             case "MODIFY":                
                 divList.Visible = false;
                 divWriteModify.Visible = true;
-
-                GetDetail();
+                txtBelong.ReadOnly = true;
 
                 btnNew.Visible = false;
                 btnModify.Visible = false;
                 btnList.Visible = true;
                 btnSave.Visible = true;
-                btnDel.Visible = true;
+                btnDel.Visible = false;
+
+                GetDetail();
 
                 lblWriteModeTitle.Text = "수정";
                 break;
             default:                
                 divList.Visible = true;
                 divWriteModify.Visible = false;
+                txtBelong.ReadOnly = false;
 
                 GetList();
 
@@ -180,6 +184,7 @@ public partial class manage_groups : System.Web.UI.Page
                 txtBelong.Text = ds.Tables[0].Rows[0]["belong_nm"].ToString().Trim();
                 txtManager.Text = ds.Tables[0].Rows[0]["manager"].ToString().Trim();
                 ddl_use_yn.SelectedValue = ds.Tables[0].Rows[0]["use_yn"].ToString();
+                btnDel.Visible = ds.Tables[0].Rows[0]["can_delete"].ToString().Equals("Y");
             }
             
         }
@@ -195,27 +200,20 @@ public partial class manage_groups : System.Web.UI.Page
         try
         {
             string seq = hdSeq.Value.ToString().Trim();
-            string belongNm = seq.Equals(string.Empty) ? txtBelong.Text.Trim() : hdBelong.Value.ToString().Trim();
 
-            DataSet ds1 = EfStoredProcedure.ExecuteDataSet(
-                "ubfgj3.dbo.SP_manage_group_duplicate_sel",
-                new SqlParameter("@BelongNm", belongNm),
-                new SqlParameter("@Retreat", SqlDbType.Int)
+            if (seq.Equals(string.Empty))
+            {
+                DataSet ds1 = EfStoredProcedure.ExecuteDataSet(
+                    "ubfgj3.dbo.SP_manage_group_duplicate_sel",
+                    new SqlParameter("@BelongNm", txtBelong.Text.Trim()),
+                    new SqlParameter("@Retreat", SqlDbType.Int) { Value = Convert.ToInt32(ddl_retreat.SelectedValue) },
+                    new SqlParameter("@Seq", SqlDbType.Int) { Value = DBNull.Value });
+
+                if (ds1.Tables[0].Rows.Count > 0)
                 {
-                    Value = seq.Equals(string.Empty)
-                        ? (object)Convert.ToInt32(ddl_retreat.SelectedValue)
-                        : DBNull.Value
-                },
-                new SqlParameter("@Seq", SqlDbType.Int) { Value = seq.Equals(string.Empty) ? (object)DBNull.Value : Convert.ToInt32(seq) });
-
-            if (ds1.Tables[0].Rows.Count > 0)
-            {
-                CodeHelper.Redirect("이미 사용중인 요회명입니다.", "/manage/groups.aspx");
-
-            }
-            else
-            {
-                if (hdSeq.Value.ToString().Trim().Equals(string.Empty))
+                    CodeHelper.Redirect("이미 사용중인 요회명입니다.", "/manage/groups.aspx");
+                }
+                else
                 {
                     EfStoredProcedure.ExecuteNonQuery(
                         "ubfgj3.dbo.SP_manage_group_ins",
@@ -228,23 +226,20 @@ public partial class manage_groups : System.Web.UI.Page
 
                     CodeHelper.Redirect("저장하였습니다.", "/manage/groups.aspx");
                 }
-                else
-                {
-                    EfStoredProcedure.ExecuteNonQuery(
-                        "ubfgj3.dbo.SP_manage_group_upd",
-                        new SqlParameter("@Seq", SqlDbType.Int) { Value = Convert.ToInt32(seq) },
-                        new SqlParameter("@BelongNm", hdBelong.Value.ToString().Trim()),
-                        new SqlParameter("@Manager", hdManager.Value.ToString().Trim()),
-                        new SqlParameter("@UseYn", hdUseYN.Value),
-                        new SqlParameter("@LoginId", _login_id),
-                        new SqlParameter("@UserIp", CodeHelper.GetUserIP));
-
-                    CodeHelper.Redirect("수정하였습니다.", "/manage/groups.aspx?mode=modify&seq=" + hdSeq.Value.ToString().Trim());
-                }
-                
             }
+            else
+            {
+                EfStoredProcedure.ExecuteNonQuery(
+                    "ubfgj3.dbo.SP_manage_group_upd",
+                    new SqlParameter("@Seq", SqlDbType.Int) { Value = Convert.ToInt32(seq) },
+                    new SqlParameter("@BelongNm", txtBelong.Text.Trim()),
+                    new SqlParameter("@Manager", hdManager.Value.ToString().Trim()),
+                    new SqlParameter("@UseYn", hdUseYN.Value),
+                    new SqlParameter("@LoginId", _login_id),
+                    new SqlParameter("@UserIp", CodeHelper.GetUserIP));
 
-            
+                CodeHelper.Redirect("수정하였습니다.", "/manage/groups.aspx?mode=modify&seq=" + hdSeq.Value.ToString().Trim());
+            }
 
         }
         catch (Exception ex)
@@ -258,6 +253,12 @@ public partial class manage_groups : System.Web.UI.Page
     {
         try
         {
+            if (!IsGroupDeleteAllowed())
+            {
+                CodeHelper.Redirect("요회구성원이 등록된 이력이 있어 삭제할 수 없습니다.", "/manage/groups.aspx?mode=modify&seq=" + hdSeq.Value.ToString().Trim());
+                return;
+            }
+
             EfStoredProcedure.ExecuteNonQuery(
                 "ubfgj3.dbo.SP_manage_group_del",
                 new SqlParameter("@Seq", SqlDbType.Int) { Value = Convert.ToInt32(hdSeq.Value) });
@@ -269,6 +270,16 @@ public partial class manage_groups : System.Web.UI.Page
 
             Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "Alert", "<script>alert('삭제 중 에러 발생 : " + Server.HtmlEncode(ex.Message) + @"');</script>");
         }
+    }
+
+    protected bool IsGroupDeleteAllowed()
+    {
+        DataSet ds = EfStoredProcedure.ExecuteDataSet(
+            "ubfgj3.dbo.SP_manage_group_detail_sel",
+            new SqlParameter("@Seq", SqlDbType.Int) { Value = Convert.ToInt32(hdSeq.Value.ToString().Trim()) });
+
+        return ds.Tables[0].Rows.Count > 0
+            && ds.Tables[0].Rows[0]["can_delete"].ToString().Equals("Y");
     }
 
 
