@@ -23,10 +23,12 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: ${{ secrets.FTP_PORT }}
+          local-dir: ./WebRoot/
           server-dir: /www/
+          state-name: ftp-deploy-sync-state.json
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
-            .github/**
             _attatch/**
+            .well-known/**
