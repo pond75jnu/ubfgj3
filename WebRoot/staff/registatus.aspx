@@ -60,13 +60,15 @@
                     <div id="divDuesInfo" runat="server" class="site-dues-info">
                     </div>
                 </div>
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div id="divRegistFeeSummary" runat="server" class="text-[15px] leading-6 text-ink">
-                    </div>
-                    <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
-                        <asp:Button ID="btnSave" runat="server" CssClass="inline-flex min-h-11 items-center justify-center rounded-pill bg-action px-[22px] py-[11px] text-[17px] font-normal text-white transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus disabled:cursor-not-allowed disabled:bg-[#7a7a7a]" Text="저장 (실무확인)" OnClientClick="return manage_confirm_save();" OnClick="btnSave_Click" />
-                        <asp:Button ID="btnExcel" runat="server" CssClass="inline-flex min-h-11 items-center justify-center rounded-pill border border-action bg-white px-[22px] py-[11px] text-[17px] font-normal text-action transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus disabled:cursor-not-allowed disabled:border-hairline disabled:text-[#7a7a7a]" Text="엑셀저장" OnClientClick="excel_export()" />
-                    </div>
+                <div class="site-regist-summary-host">
+                    <section class="site-regist-summary" aria-label="등록비 요약">
+                        <div id="divRegistFeeSummary" runat="server" class="site-regist-summary-content">
+                        </div>
+                        <div class="site-regist-summary-actions">
+                            <asp:Button ID="btnSave" runat="server" CssClass="inline-flex min-h-11 items-center justify-center rounded-pill bg-action px-[22px] py-[11px] text-[17px] font-normal text-white transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus disabled:cursor-not-allowed disabled:bg-[#7a7a7a]" Text="저장 (실무확인)" OnClientClick="return manage_confirm_save();" OnClick="btnSave_Click" />
+                            <asp:Button ID="btnExcel" runat="server" CssClass="inline-flex min-h-11 items-center justify-center rounded-pill border border-action bg-white px-[22px] py-[11px] text-[17px] font-normal text-action transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus disabled:cursor-not-allowed disabled:border-hairline disabled:text-[#7a7a7a]" Text="엑셀저장" OnClientClick="excel_export()" />
+                        </div>
+                    </section>
                 </div>
                 <div class="table-wrapper-scroll-y my-custom-scrollbar rounded-apple-lg border border-hairline bg-white">
                     <asp:ListView runat="server" ID="lvItems" DataKeyNames="seq"

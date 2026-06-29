@@ -235,6 +235,8 @@ public partial class staff_registatus : System.Web.UI.Page
     {
         decimal completeTotal = 0;
         decimal partialTotal = 0;
+        int completeCount = 0;
+        int partialCount = 0;
 
         foreach (DataRow row in table.Rows)
         {
@@ -242,21 +244,50 @@ public partial class staff_registatus : System.Web.UI.Page
             string registStatus = row["regi_status_nm"].ToString();
 
             if (registStatus.Equals("완전등록"))
+            {
                 completeTotal += userDues;
+                completeCount++;
+            }
             else if (registStatus.Equals("부분등록"))
+            {
                 partialTotal += userDues;
+                partialCount++;
+            }
         }
 
         decimal total = completeTotal + partialTotal;
+        int totalCount = completeCount + partialCount;
 
-        divRegistFeeSummary.InnerHtml = "📋&nbsp;<strong>총 등록비 " + FormatWon(total) + "</strong>"
-            + "<span class=\"text-[#333333]\">(완전등록 " + FormatWon(completeTotal)
-            + " / 부분등록 " + FormatWon(partialTotal) + ")</span>";
+        divRegistFeeSummary.InnerHtml =
+            "<div class=\"site-regist-summary-main\">"
+            + "<span class=\"site-regist-summary-label\">총 등록비: </span>"
+            + "<strong class=\"site-regist-summary-amount\">" + FormatWon(total) + "</strong>"
+            + "&nbsp;<span class=\"site-regist-summary-count\">" + FormatPeople(totalCount) + "</span>"
+            + "</div>"
+            + "<div class=\"site-regist-summary-detail\">"
+            + "" + BuildRegistSummaryChip("완전등록: ", completeTotal, completeCount, "complete")
+            + "<span class=\"site-regist-summary-mobile-break\" aria-hidden=\"true\"></span>"
+            + BuildRegistSummaryChip("부분등록: ", partialTotal, partialCount, "partial")
+            + "</div>";
     }
 
     protected string FormatWon(decimal amount)
     {
         return string.Format(CultureInfo.InvariantCulture, "{0:#,##0}원", amount);
+    }
+
+    protected string FormatPeople(int count)
+    {
+        return string.Format(CultureInfo.InvariantCulture, "{0:#,##0}명", count);
+    }
+
+    protected string BuildRegistSummaryChip(string label, decimal amount, int count, string modifier)
+    {
+        return "<span class=\"site-regist-summary-chip is-" + modifier + "\">"
+            + "<span class=\"site-regist-summary-chip-label\">" + label + "</span>"
+            + "<strong class=\"site-regist-summary-chip-amount\">" + FormatWon(amount) + "</strong>"
+            + "&nbsp;<span class=\"site-regist-summary-chip-count\">(" + FormatPeople(count) + ")</span>"
+            + "</span>";
     }
 
     protected void listView_ItemDataBound(object sender, ListViewItemEventArgs e)
