@@ -176,7 +176,7 @@ public partial class member_join : System.Web.UI.Page
 
     protected void btnIdChk_Click(object sender, EventArgs e)
     {
-        ifrChkID.Src = "ChkID.aspx?id=" + txtJoinID.Text.Trim();
+        ifrChkID.Src = "/member/chkid?id=" + txtJoinID.Text.Trim();
     }
 
     protected void btnStep02_Click(object sender, EventArgs e)
@@ -195,7 +195,7 @@ public partial class member_join : System.Web.UI.Page
 
     protected void btnStepCancel_Click(object sender, EventArgs e)
     {
-        Response.Redirect("/member/join.aspx", false);
+        Response.Redirect("/member/join", false);
     }
 
     protected void btnStep03_Click(object sender, EventArgs e)

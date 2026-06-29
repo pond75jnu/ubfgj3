@@ -5,7 +5,7 @@ public partial class master_master_main_noframe : System.Web.UI.MasterPage
 {
     private string _url_scheme = HttpContext.Current.Request.Url.Scheme;
     private string _domain = HttpContext.Current.Request.Url.Host;
-    private string _path = HttpContext.Current.Request.Url.PathAndQuery;
+    private string _path = CodeHelper.ToCanonicalUrl(HttpContext.Current.Request.Url.PathAndQuery);
 
     protected void Page_Load(object sender, EventArgs e)
     {

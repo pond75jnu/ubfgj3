@@ -97,14 +97,14 @@
                             </div>
                         </div>
                         <div id="divButtons" class="site-admin-actions">
-                            <a id="btnNew" runat="server" href="/manage/groups.aspx?mode=write" class="inline-flex min-h-11 items-center justify-center rounded-pill bg-action px-[22px] py-[11px] text-[17px] font-normal text-white no-underline transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus">신규
+                            <a id="btnNew" runat="server" href="/manage/groups?mode=write" class="inline-flex min-h-11 items-center justify-center rounded-pill bg-action px-[22px] py-[11px] text-[17px] font-normal text-white no-underline transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus">신규
                             </a>
                             <input type="button" id="btnModify" runat="server" onclick="modify_group();" value="수정" class="site-button site-button-primary" />
                             <asp:Button ID="btnSave" runat="server" Text="저장" CssClass="site-button site-button-primary site-group-action-button" OnClick="btnSave_Click"
                                 OnClientClick="return uConfirm_group();" />
                             <asp:Button ID="btnDel" runat="server" Text="삭제" CssClass="site-button site-button-danger site-group-action-button" OnClientClick="return uConfirmDel_group();"
                                 OnClick="btnDel_Click" />
-                            <a id="btnList" runat="server" href="/manage/groups.aspx" class="site-button site-button-list site-group-action-button">목록</a>
+                            <a id="btnList" runat="server" href="/manage/groups" class="site-button site-button-list site-group-action-button">목록</a>
                         </div>
 
                         <asp:HiddenField ID="hdBelong" runat="server" />

@@ -10,7 +10,7 @@ public partial class staff_status : System.Web.UI.Page
 {
     string _auth = string.Empty;
     string _login_id = string.Empty;
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower();
+    string _path = CodeHelper.GetCurrentCanonicalPath();
 
     protected void Page_Load(object sender, EventArgs e)
     {

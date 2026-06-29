@@ -57,13 +57,13 @@ public partial class usercontrol_left_menu : System.Web.UI.UserControl
         if (!Page.IsPostBack)
         {
 
-            if (_menu_path.Equals("/group/usermanage.aspx") || _menu_path.Equals("/staff/registatus.aspx"))
+            if (_path.Equals("/group/usermanage") || _path.Equals("/staff/registatus"))
                 GetRegistInfo();
 
-            if (_menu_path.Equals("/staff/expenses.aspx"))
+            if (_path.Equals("/staff/expenses"))
                 GetExpenses();
 
-            if (_menu_path.Equals("/staff/income.aspx"))
+            if (_path.Equals("/staff/income"))
                 GetIncome();
 
             SetMenu();
@@ -106,7 +106,7 @@ public partial class usercontrol_left_menu : System.Web.UI.UserControl
 
             sb.Append("</ul></nav>");
 
-            if (_menu_path.Equals("/group/usermanage.aspx") || _menu_path.Equals("/staff/registatus.aspx"))
+            if (_path.Equals("/group/usermanage") || _path.Equals("/staff/registatus"))
             {
                 string _caption = !m_Belong.Equals("%") ? CodeHelper.GetGroupName(m_Belong) + " 등록현황" : "전체 등록현황";
                 string _table_html = @"
@@ -188,13 +188,13 @@ public partial class usercontrol_left_menu : System.Web.UI.UserControl
     </table>
                 ";
 
-                if (_menu_path.Equals("/group/usermanage.aspx"))
+                if (_path.Equals("/group/usermanage"))
                     sb = new StringBuilder(); //구성원·등록관리 메뉴인 경우 왼쪽 서브메뉴 필요없음
 
                 sb.Append(_table_html);
             }
 
-            if (_menu_path.Equals("/staff/expenses.aspx"))
+            if (_path.Equals("/staff/expenses"))
             {
                 string _table_expenses_html = @"
     <table class='site-summary-table'>
@@ -225,7 +225,7 @@ public partial class usercontrol_left_menu : System.Web.UI.UserControl
                 sb.Append(_table_expenses_html);
             }
 
-            if (_menu_path.Equals("/staff/income.aspx"))
+            if (_path.Equals("/staff/income"))
             {
                 string _table_income_html = @"
     <table class='site-summary-table'>

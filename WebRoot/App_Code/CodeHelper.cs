@@ -90,6 +90,9 @@ public class CodeHelper
         Uri absoluteUri;
         if (Uri.TryCreate(url, UriKind.Absolute, out absoluteUri))
         {
+            if (!IsLocalAbsoluteUri(absoluteUri))
+                return url;
+
             return absoluteUri.GetLeftPart(UriPartial.Authority)
                 + ToCanonicalPath(absoluteUri.AbsolutePath)
                 + absoluteUri.Query
@@ -120,6 +123,15 @@ public class CodeHelper
             canonicalPath = canonicalPath.TrimStart('/');
 
         return canonicalPath + query + fragment;
+    }
+
+    private static bool IsLocalAbsoluteUri(Uri absoluteUri)
+    {
+        HttpContext ctx = HttpContext.Current;
+        if (ctx == null || ctx.Request == null || ctx.Request.Url == null)
+            return false;
+
+        return absoluteUri.Authority.Equals(ctx.Request.Url.Authority, StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool VirtualAspxExists(string virtualPath)

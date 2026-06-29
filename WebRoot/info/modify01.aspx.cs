@@ -8,7 +8,7 @@ public partial class info_modify01 : System.Web.UI.Page
 {
     string _auth = string.Empty;
     string _login_id = string.Empty;
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower();
+    string _path = CodeHelper.GetCurrentCanonicalPath();
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -96,7 +96,7 @@ public partial class info_modify01 : System.Web.UI.Page
                     new SqlParameter("@Belong", SqlDbType.Int) { Value = Convert.ToInt32(hdBelong.Value) },
                     new SqlParameter("@Email", email));
 
-                CodeHelper.Redirect("저장하였습니다.", "/info/modify01.aspx");
+                CodeHelper.Redirect("저장하였습니다.", "/info/modify01");
             }
 
 

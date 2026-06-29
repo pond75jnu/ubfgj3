@@ -169,14 +169,14 @@
                     </div>
                 </div>
                 <div id="divButtons" class="flex flex-wrap gap-2">
-                    <a id="btnNew" runat="server" href="/staff/income.aspx?mode=write" class="inline-flex min-h-11 items-center justify-center rounded-pill bg-action px-[22px] py-[11px] text-[17px] font-normal text-white transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus">신규
+                    <a id="btnNew" runat="server" href="/staff/income?mode=write" class="inline-flex min-h-11 items-center justify-center rounded-pill bg-action px-[22px] py-[11px] text-[17px] font-normal text-white transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus">신규
                     </a>
                     <input type="button" id="btnModify" runat="server" onclick="modify_income();" value="수정" class="inline-flex min-h-11 items-center justify-center rounded-pill bg-action px-[22px] py-[11px] text-[17px] font-normal text-white transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus" />
                     <asp:Button ID="btnSave" runat="server" Text="저장" CssClass="inline-flex min-h-11 items-center justify-center rounded-pill bg-action px-[22px] py-[11px] text-[17px] font-normal text-white transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus disabled:cursor-not-allowed disabled:bg-[#7a7a7a]" OnClick="btnSave_Click"
                         OnClientClick="return uConfirm_income();" />
                     <asp:Button ID="btnDel" runat="server" Text="삭제" CssClass="inline-flex min-h-11 items-center justify-center rounded-pill border border-[#b42318] bg-[#b42318] px-[22px] py-[11px] text-[17px] font-normal text-white transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus disabled:cursor-not-allowed disabled:border-[#f1b8b2] disabled:bg-[#fef3f2] disabled:text-[#b42318]" OnClientClick="return uConfirmDel_income();"
                         OnClick="btnDel_Click" />
-                    <a id="btnList" runat="server" href="/staff/income.aspx" class="inline-flex min-h-11 items-center justify-center rounded-pill border border-action bg-white px-[22px] py-[11px] text-[17px] font-normal text-action transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus">목록
+                    <a id="btnList" runat="server" href="/staff/income" class="inline-flex min-h-11 items-center justify-center rounded-pill border border-action bg-white px-[22px] py-[11px] text-[17px] font-normal text-action transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus">목록
                     </a>
                     <a id="btnExportExcel" runat="server" href="javascript:;" onclick="income_list_excel();" class="inline-flex min-h-11 items-center justify-center rounded-pill border border-action bg-white px-[22px] py-[11px] text-[17px] font-normal text-action transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus">
                         엑셀저장

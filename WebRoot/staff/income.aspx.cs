@@ -12,7 +12,7 @@ public partial class staff_income : System.Web.UI.Page
 {
     string _auth = string.Empty;
     string _login_id = string.Empty;
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower();
+    string _path = CodeHelper.GetCurrentCanonicalPath();
     private string _domain = HttpContext.Current.Request.Url.Host;
 
     #region 이미지폴더 기본위치 설정    

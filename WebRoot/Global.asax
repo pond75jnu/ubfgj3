@@ -12,7 +12,7 @@
 
     protected void Application_BeginRequest(object sender, EventArgs e)
     {
-        RedirectAspxToExtensionless();
+        RedirectToCanonicalUrl();
     }
 
     private static void RegisterExtensionlessRoutes(RouteCollection routes)
@@ -38,14 +38,18 @@
         }
     }
 
-    private void RedirectAspxToExtensionless()
+    private void RedirectToCanonicalUrl()
     {
         HttpContext ctx = HttpContext.Current;
         if (ctx == null || ctx.Request == null || ctx.Response == null)
             return;
 
         string path = ctx.Request.Url.AbsolutePath;
-        if (!path.EndsWith(".aspx", StringComparison.OrdinalIgnoreCase))
+        bool isAspxPath = path.EndsWith(".aspx", StringComparison.OrdinalIgnoreCase);
+        bool isDefaultPath = CodeHelper.ToCanonicalPath(path).Equals("/")
+            && !path.Equals("/", StringComparison.Ordinal);
+
+        if (!isAspxPath && !isDefaultPath)
             return;
 
         string canonicalUrl = CodeHelper.ToCanonicalUrl(ctx.Request.RawUrl);

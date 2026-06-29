@@ -11,7 +11,7 @@ public partial class group_usermanage : System.Web.UI.Page
     string _login_id = string.Empty;
     string _retreat_code = string.Empty;
     string _belong_code = string.Empty;
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower();
+    string _path = CodeHelper.GetCurrentCanonicalPath();
 
 
     protected void Page_Load(object sender, EventArgs e)
@@ -514,7 +514,7 @@ public partial class group_usermanage : System.Web.UI.Page
                     new SqlParameter("@DELETE_CONFIRMED", _auth.ToLower().Equals("admin") || _auth.ToLower().Equals("manager") ? "Y" : "N"));
             }
 
-            CodeHelper.Redirect("저장하였습니다.", "/group/usermanage.aspx?belong=" + ddl_group.SelectedValue);
+            CodeHelper.Redirect("저장하였습니다.", "/group/usermanage?belong=" + ddl_group.SelectedValue);
 
             //GetLoadMembers();
             //Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "Alert", "<script>alert('저장하였습니다!');</script>");
@@ -532,7 +532,7 @@ public partial class group_usermanage : System.Web.UI.Page
         //GetLoadMembers();
 
         //left메뉴 요회별등록현황을 가져오기 위해 아래와 같이 처리
-        Response.Redirect("/group/usermanage.aspx?belong=" + ddl_group.SelectedValue, false);
+        Response.Redirect("/group/usermanage?belong=" + ddl_group.SelectedValue, false);
     }
 
     protected void ddl_retreat_SelectedIndexChanged(object sender, EventArgs e)
@@ -555,7 +555,7 @@ public partial class group_usermanage : System.Web.UI.Page
 
             //GetLoadMembers();
             //Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "Alert", "<script>alert('이전 수양회 구성원을 이관하였습니다.');</script>");
-            CodeHelper.Redirect("이전 수양회 구성원을 이관하였습니다.", "/group/usermanage.aspx?belong=" + ddl_group.SelectedValue);
+            CodeHelper.Redirect("이전 수양회 구성원을 이관하였습니다.", "/group/usermanage?belong=" + ddl_group.SelectedValue);
         }
         catch (Exception ex)
         {

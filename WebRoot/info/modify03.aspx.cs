@@ -3,7 +3,7 @@ using System.Web;
 
 public partial class info_modify03 : System.Web.UI.Page
 {
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower();
+    string _path = CodeHelper.GetCurrentCanonicalPath();
 
     protected void Page_Load(object sender, EventArgs e)
     {

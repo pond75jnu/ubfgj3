@@ -9,7 +9,7 @@ public partial class manage_groups : System.Web.UI.Page
 {
     string _auth = string.Empty;
     string _login_id = string.Empty;
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower();
+    string _path = CodeHelper.GetCurrentCanonicalPath();
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -35,7 +35,7 @@ public partial class manage_groups : System.Web.UI.Page
                     PageMode("MODIFY");
                 }
                 else
-                    Response.Redirect("/manage/groups.aspx", false);
+                    Response.Redirect("/manage/groups", false);
             }
             else
             {
@@ -211,7 +211,7 @@ public partial class manage_groups : System.Web.UI.Page
 
                 if (ds1.Tables[0].Rows.Count > 0)
                 {
-                    CodeHelper.Redirect("이미 사용중인 요회명입니다.", "/manage/groups.aspx");
+                    CodeHelper.Redirect("이미 사용중인 요회명입니다.", "/manage/groups");
                 }
                 else
                 {
@@ -224,7 +224,7 @@ public partial class manage_groups : System.Web.UI.Page
                         new SqlParameter("@LoginId", _login_id),
                         new SqlParameter("@UserIp", CodeHelper.GetUserIP));
 
-                    CodeHelper.Redirect("저장하였습니다.", "/manage/groups.aspx");
+                    CodeHelper.Redirect("저장하였습니다.", "/manage/groups");
                 }
             }
             else
@@ -238,7 +238,7 @@ public partial class manage_groups : System.Web.UI.Page
                     new SqlParameter("@LoginId", _login_id),
                     new SqlParameter("@UserIp", CodeHelper.GetUserIP));
 
-                CodeHelper.Redirect("수정하였습니다.", "/manage/groups.aspx?mode=modify&seq=" + hdSeq.Value.ToString().Trim());
+                CodeHelper.Redirect("수정하였습니다.", "/manage/groups?mode=modify&seq=" + hdSeq.Value.ToString().Trim());
             }
 
         }
@@ -255,7 +255,7 @@ public partial class manage_groups : System.Web.UI.Page
         {
             if (!IsGroupDeleteAllowed())
             {
-                CodeHelper.Redirect("요회구성원이 등록된 이력이 있어 삭제할 수 없습니다.", "/manage/groups.aspx?mode=modify&seq=" + hdSeq.Value.ToString().Trim());
+                CodeHelper.Redirect("요회구성원이 등록된 이력이 있어 삭제할 수 없습니다.", "/manage/groups?mode=modify&seq=" + hdSeq.Value.ToString().Trim());
                 return;
             }
 
@@ -263,7 +263,7 @@ public partial class manage_groups : System.Web.UI.Page
                 "ubfgj3.dbo.SP_manage_group_del",
                 new SqlParameter("@Seq", SqlDbType.Int) { Value = Convert.ToInt32(hdSeq.Value) });
 
-            CodeHelper.Redirect("삭제하였습니다!", "/manage/groups.aspx");
+            CodeHelper.Redirect("삭제하였습니다!", "/manage/groups");
         }
         catch (Exception ex)
         {

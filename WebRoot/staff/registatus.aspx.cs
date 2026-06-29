@@ -16,7 +16,7 @@ public partial class staff_registatus : System.Web.UI.Page
     string _belong_code = string.Empty;
     string _regi_code = string.Empty;
 
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower();
+    string _path = CodeHelper.GetCurrentCanonicalPath();
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -352,17 +352,17 @@ public partial class staff_registatus : System.Web.UI.Page
 
     protected void ddl_group_SelectedIndexChanged(object sender, EventArgs e)
     {        
-        Response.Redirect("/staff/registatus.aspx?ret=" + ddl_retreat.SelectedValue + "&belong=" + ddl_group.SelectedValue + "&reg=" + ddl_regi_type.SelectedValue, false);
+        Response.Redirect("/staff/registatus?ret=" + ddl_retreat.SelectedValue + "&belong=" + ddl_group.SelectedValue + "&reg=" + ddl_regi_type.SelectedValue, false);
     }
 
     protected void ddl_regi_type_SelectedIndexChanged(object sender, EventArgs e)
     {
-        Response.Redirect("/staff/registatus.aspx?ret=" + ddl_retreat.SelectedValue + "&belong=" + ddl_group.SelectedValue + "&reg=" + ddl_regi_type.SelectedValue, false);
+        Response.Redirect("/staff/registatus?ret=" + ddl_retreat.SelectedValue + "&belong=" + ddl_group.SelectedValue + "&reg=" + ddl_regi_type.SelectedValue, false);
     }
 
     protected void ddl_retreat_SelectedIndexChanged(object sender, EventArgs e)
     {
-        Response.Redirect("/staff/registatus.aspx?ret=" + ddl_retreat.SelectedValue + "&belong=" + ddl_group.SelectedValue + "&reg=" + ddl_regi_type.SelectedValue, false);
+        Response.Redirect("/staff/registatus?ret=" + ddl_retreat.SelectedValue + "&belong=" + ddl_group.SelectedValue + "&reg=" + ddl_regi_type.SelectedValue, false);
     }
 
 
@@ -390,7 +390,7 @@ public partial class staff_registatus : System.Web.UI.Page
                 }
             }
 
-            CodeHelper.Redirect("실무자확인 처리되었습니다.", "/staff/registatus.aspx?belong=" + ddl_group.SelectedValue);
+            CodeHelper.Redirect("실무자확인 처리되었습니다.", "/staff/registatus?belong=" + ddl_group.SelectedValue);
         }
         catch (Exception ex)
         {

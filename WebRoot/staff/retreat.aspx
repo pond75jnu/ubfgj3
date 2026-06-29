@@ -147,10 +147,10 @@
                     </div>
                 </div>
                 <div id="divButtons" class="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                    <a id="btnNew" runat="server" href="/staff/retreat.aspx?mode=write" class="inline-flex min-h-11 items-center justify-center rounded-pill bg-action px-[22px] py-[11px] text-[17px] font-normal text-white no-underline transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus">신규
+                    <a id="btnNew" runat="server" href="/staff/retreat?mode=write" class="inline-flex min-h-11 items-center justify-center rounded-pill bg-action px-[22px] py-[11px] text-[17px] font-normal text-white no-underline transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus">신규
                     </a>
                     <input type="button" id="btnModify" runat="server" onclick="modify_retreat();" value="수정" class="inline-flex min-h-11 items-center justify-center rounded-pill bg-action px-[22px] py-[11px] text-[17px] font-normal text-white transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus" />
-                    <a id="btnList" runat="server" href="/staff/retreat.aspx" class="inline-flex min-h-11 items-center justify-center rounded-pill border border-action bg-white px-[22px] py-[11px] text-[17px] font-normal text-action no-underline transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus">목록
+                    <a id="btnList" runat="server" href="/staff/retreat" class="inline-flex min-h-11 items-center justify-center rounded-pill border border-action bg-white px-[22px] py-[11px] text-[17px] font-normal text-action no-underline transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus">목록
                     </a>
                     <asp:Button ID="btnSave" runat="server" Text="저장" CssClass="inline-flex min-h-11 items-center justify-center rounded-pill bg-action px-[22px] py-[11px] text-[17px] font-normal text-white transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-action-focus" OnClick="btnSave_Click"
                         OnClientClick="return uConfirm_retreat();" />

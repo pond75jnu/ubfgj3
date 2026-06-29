@@ -16,7 +16,7 @@ public partial class staff_registatus_excel_export : System.Web.UI.Page
 
     private string _url_scheme = HttpContext.Current.Request.Url.Scheme;
     private string _domain = HttpContext.Current.Request.Url.Host;
-    private string _path = HttpContext.Current.Request.Url.PathAndQuery;
+    private string _path = CodeHelper.ToCanonicalUrl(HttpContext.Current.Request.Url.PathAndQuery);
 
     #region Page Init
     protected void Page_Init(object sender, EventArgs e)

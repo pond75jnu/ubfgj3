@@ -10,7 +10,7 @@ public partial class staff_retreat : System.Web.UI.Page
 {
     string _auth = string.Empty;
     string _login_id = string.Empty;
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower();
+    string _path = CodeHelper.GetCurrentCanonicalPath();
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -35,7 +35,7 @@ public partial class staff_retreat : System.Web.UI.Page
                     PageMode("MODIFY");
                 }
                 else
-                    Response.Redirect("/staff/retreat.aspx", false);
+                    Response.Redirect("/staff/retreat", false);
             }
             else
                 PageMode("LIST");
@@ -248,11 +248,11 @@ public partial class staff_retreat : System.Web.UI.Page
             }
 
             if (mode.Equals("C"))
-                CodeHelper.Redirect("저장하였습니다.", "/staff/retreat.aspx");
+                CodeHelper.Redirect("저장하였습니다.", "/staff/retreat");
             else if (mode.Equals("U"))
-                CodeHelper.Redirect("수정하였습니다.", "/staff/retreat.aspx?mode=modify&seq=" + hdSeq.Value.Trim());
+                CodeHelper.Redirect("수정하였습니다.", "/staff/retreat?mode=modify&seq=" + hdSeq.Value.Trim());
             else if (mode.Equals("D"))
-                CodeHelper.Redirect("삭제하였습니다!", "/staff/retreat.aspx");
+                CodeHelper.Redirect("삭제하였습니다!", "/staff/retreat");
         }
     }
 
@@ -268,7 +268,7 @@ public partial class staff_retreat : System.Web.UI.Page
 
             if (ds1.Tables[0].Rows.Count > 0)
             {
-                CodeHelper.Redirect("동일한 이름으로 저장된 수양회가 있습니다.", "/staff/retreat.aspx");
+                CodeHelper.Redirect("동일한 이름으로 저장된 수양회가 있습니다.", "/staff/retreat");
 
             }
             else

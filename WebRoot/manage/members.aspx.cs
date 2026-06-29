@@ -11,7 +11,7 @@ public partial class manage_members : System.Web.UI.Page
     private const string PasswordResetAllowedLoginId = "pond75";
     string _auth = string.Empty;
     string _login_id = string.Empty;
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower();
+    string _path = CodeHelper.GetCurrentCanonicalPath();
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -31,7 +31,7 @@ public partial class manage_members : System.Web.UI.Page
                     PageMode("MODIFY");
                 }
                 else
-                    Response.Redirect("/manage/members.aspx", false);
+                    Response.Redirect("/manage/members", false);
             }
             else
                 PageMode("LIST");
@@ -244,7 +244,7 @@ public partial class manage_members : System.Web.UI.Page
                     SendEmail();
                 }
 
-                CodeHelper.Redirect("저장하였습니다.", "/manage/members.aspx?mode=modify&id=" + hdID.Value.ToString().Trim());
+                CodeHelper.Redirect("저장하였습니다.", "/manage/members?mode=modify&id=" + hdID.Value.ToString().Trim());
             }
 
             
@@ -265,7 +265,7 @@ public partial class manage_members : System.Web.UI.Page
                 "ubfgj3.dbo.SP_manage_member_del",
                 new SqlParameter("@LoginId", hdID.Value.ToString().Trim().ToLower()));
 
-            CodeHelper.Redirect("삭제하였습니다!", "/manage/members.aspx");
+            CodeHelper.Redirect("삭제하였습니다!", "/manage/members");
         }
         catch (Exception ex)
         {
@@ -306,19 +306,19 @@ public partial class manage_members : System.Web.UI.Page
     {
         if (!CanResetPassword())
         {
-            CodeHelper.Redirect("비밀번호 초기화 권한이 없습니다.", "/manage/members.aspx?mode=modify&id=" + hdID.Value.ToString().Trim());
+            CodeHelper.Redirect("비밀번호 초기화 권한이 없습니다.", "/manage/members?mode=modify&id=" + hdID.Value.ToString().Trim());
             return;
         }
 
         if (string.IsNullOrWhiteSpace(txtNewPWD.Text) || string.IsNullOrWhiteSpace(txtNewPWD2.Text))
         {
-            CodeHelper.Redirect("변경(초기화) 할 비밀번호를 입력하세요.", "/manage/members.aspx?mode=modify&id=" + hdID.Value.ToString().Trim());
+            CodeHelper.Redirect("변경(초기화) 할 비밀번호를 입력하세요.", "/manage/members?mode=modify&id=" + hdID.Value.ToString().Trim());
             return;
         }
 
         if (!txtNewPWD.Text.Trim().Equals(txtNewPWD2.Text.Trim()))
         {
-            CodeHelper.Redirect("변경할 비밀번호가 서로 다릅니다.", "/manage/members.aspx?mode=modify&id=" + hdID.Value.ToString().Trim());
+            CodeHelper.Redirect("변경할 비밀번호가 서로 다릅니다.", "/manage/members?mode=modify&id=" + hdID.Value.ToString().Trim());
             return;
         }
 
@@ -379,7 +379,7 @@ public partial class manage_members : System.Web.UI.Page
             msg = "\"" + txtKorNm.Text.Trim() + "\" 님의 패스워드 초기화(변경)가 실패하였습니다.";
 
         
-        CodeHelper.Redirect(msg, "/manage/members.aspx?mode=modify&id=" + hdID.Value.ToString().Trim());
+        CodeHelper.Redirect(msg, "/manage/members?mode=modify&id=" + hdID.Value.ToString().Trim());
     }
 
 

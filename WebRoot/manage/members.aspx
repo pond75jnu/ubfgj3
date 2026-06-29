@@ -168,7 +168,7 @@
                                 OnClientClick="return uConfirm_member();" />
                             <asp:Button ID="btnDel" runat="server" Text="삭제" CssClass="site-button site-button-danger" OnClientClick="return uConfirmDel_group();"
                                 OnClick="btnDel_Click" />
-                            <a id="btnList" runat="server" href="/manage/members.aspx" class="site-button site-button-list">목록</a>
+                            <a id="btnList" runat="server" href="/manage/members" class="site-button site-button-list">목록</a>
                         </div>
 
                         <asp:HiddenField ID="hdBelong" runat="server" />

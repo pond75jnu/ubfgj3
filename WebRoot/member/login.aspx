@@ -31,9 +31,9 @@
                             <span>ID 저장</span>
                         </label>
                         <div>
-                            <a href="/member/findid.aspx" class="text-action">아이디</a>
+                            <a href="/member/findid" class="text-action">아이디</a>
                             <span class="px-1 text-zinc-500">/</span>
-                            <a href="/member/findpwd.aspx" class="text-action">비밀번호</a>
+                            <a href="/member/findpwd" class="text-action">비밀번호</a>
                             <span>찾기</span>
                         </div>
                     </div>

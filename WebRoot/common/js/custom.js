@@ -169,15 +169,15 @@ function confirmRetreatSwitch() {
 }
 
 function detailview_group(seq) {
-    location.href = "/manage/groups.aspx?mode=modify&seq=" + seq;
+    location.href = "/manage/groups?mode=modify&seq=" + seq;
 }
 
 function detailview_retreat(seq) {
-    location.href = "/staff/retreat.aspx?mode=modify&seq=" + seq;
+    location.href = "/staff/retreat?mode=modify&seq=" + seq;
 }
 
 function detailview_expenses(seq) {
-    location.href = "/staff/expenses.aspx?mode=modify&seq=" + seq;
+    location.href = "/staff/expenses?mode=modify&seq=" + seq;
 }
 
 function detailview_income(seq) {
@@ -185,66 +185,66 @@ function detailview_income(seq) {
         alert('수양회비 세부 내용은 [등록확인]메뉴를 확인바랍니다.');
     }
     else {
-        location.href = "/staff/income.aspx?mode=modify&seq=" + seq;
+        location.href = "/staff/income?mode=modify&seq=" + seq;
     }
         
 }
 
 function detailview_dues(seq) {
-    location.href = "/staff/retreatdues.aspx?mode=modify&seq=" + seq;
+    location.href = "/staff/retreatdues?mode=modify&seq=" + seq;
 }
 
 function detailview_items(seq) {
     var _page_code_type;
     _page_code_type = $("#ContentPlaceHolder1_ddl_code_type").val().trim();
 
-    location.href = "/staff/items.aspx?mode=modify&seq=" + seq + "&ctype=" + _page_code_type;
+    location.href = "/staff/items?mode=modify&seq=" + seq + "&ctype=" + _page_code_type;
 }
 
 function detailview_member(id) {
-    location.href = "/manage/members.aspx?mode=modify&id=" + id;
+    location.href = "/manage/members?mode=modify&id=" + id;
 }
 
 function modify_group() {
     var _seq;
     _seq = $("#ContentPlaceHolder1_hdSeq").val().trim();
 
-    location.href = "/manage/groups.aspx?mode=modify&seq=" + _seq;
+    location.href = "/manage/groups?mode=modify&seq=" + _seq;
 }
 
 function modify_retreat() {
     var _seq;
     _seq = $("#ContentPlaceHolder1_hdSeq").val().trim();
 
-    location.href = "/staff/retreat.aspx?mode=modify&seq=" + _seq;
+    location.href = "/staff/retreat?mode=modify&seq=" + _seq;
 }
 
 function modify_retreatdues() {
     var _seq;
     _seq = $("#ContentPlaceHolder1_hdSeq").val().trim();
 
-    location.href = "/staff/retreatdues.aspx?mode=modify&seq=" + _seq;
+    location.href = "/staff/retreatdues?mode=modify&seq=" + _seq;
 }
 
 function modify_expenses() {
     var _seq;
     _seq = $("#ContentPlaceHolder1_hdSeq").val().trim();
 
-    location.href = "/staff/expenses.aspx?mode=modify&seq=" + _seq;
+    location.href = "/staff/expenses?mode=modify&seq=" + _seq;
 }
 
 function modify_income() {
     var _seq;
     _seq = $("#ContentPlaceHolder1_hdSeq").val().trim();
 
-    location.href = "/staff/income.aspx?mode=modify&seq=" + _seq;
+    location.href = "/staff/income?mode=modify&seq=" + _seq;
 }
 
 function modify_member() {
     var _id;
     _id = $("#ContentPlaceHolder1_hdID").val().trim();
 
-    location.href = "/manage/members.aspx?mode=modify&id=" + _id;
+    location.href = "/manage/members?mode=modify&id=" + _id;
 }
 
 function uConfirmDel_group() {
@@ -658,15 +658,15 @@ function uConfirm_item() {
 function go_item_list() {
     //var _page_code_type;
     //_page_code_type = $("#ContentPlaceHolder1_ddl_code_type").val().trim();
-    //location.href = "/staff/items.aspx?ctype=" + _page_code_type;
-    location.href = "/staff/items.aspx";
+    //location.href = "/staff/items?ctype=" + _page_code_type;
+    location.href = "/staff/items";
 }
 
 function go_item_new() {
     var _page_code_type;
     _page_code_type = $("#ContentPlaceHolder1_ddl_code_type").val().trim();
 
-    location.href = "/staff/items.aspx?mode=write&ctype=" + _page_code_type;
+    location.href = "/staff/items?mode=write&ctype=" + _page_code_type;
         
 }
 
@@ -1146,7 +1146,7 @@ function uFindidConfirm() {
 }
 
 function findidcancel() {
-    location.replace("/member/login.aspx");
+    location.replace("/member/login");
 }
 
 function gomain() {
@@ -1693,7 +1693,7 @@ function excel_export() {
     _retreat = $("#ContentPlaceHolder1_ddl_retreat").val();
     _group = $("#ContentPlaceHolder1_ddl_group").val();
     _regi_type = $("#ContentPlaceHolder1_ddl_regi_type").val();
-    _url = "/staff/registatus_excel_export.aspx?ret=" + _retreat + "&grp=" + _group + "&reg=" + _regi_type;
+    _url = "/staff/registatus_excel_export?ret=" + _retreat + "&grp=" + _group + "&reg=" + _regi_type;
 
     //alert(_url);
     document.getElementById("ifrSelfReportExcel").src = _url;
@@ -1744,7 +1744,7 @@ function expenses_detail_print() {
     var win;
 
     _seq = $("#ContentPlaceHolder1_hdSeq").val();
-    win = window.open("/staff/in_ex_detail_print.aspx?seq=" + _seq + "&type=2", "PopupWin", "width=800,height=900");
+    win = window.open("/staff/in_ex_detail_print?seq=" + _seq + "&type=2", "PopupWin", "width=800,height=900");
     
 }
 
@@ -1753,7 +1753,7 @@ function income_detail_print() {
     var win;
 
     _seq = $("#ContentPlaceHolder1_hdSeq").val();
-    win = window.open("/staff/in_ex_detail_print.aspx?seq=" + _seq + "&type=1", "PopupWin", "width=800,height=900");
+    win = window.open("/staff/in_ex_detail_print?seq=" + _seq + "&type=1", "PopupWin", "width=800,height=900");
 
 }
 
@@ -1762,7 +1762,7 @@ function expenses_list_excel() {
     var _url;
 
     _retreat = $("#ContentPlaceHolder1_ddl_retreat").val();
-    _url = "/staff/in_ex_excel_export.aspx?ret=" + _retreat + "&type=2";
+    _url = "/staff/in_ex_excel_export?ret=" + _retreat + "&type=2";
         
     document.getElementById("ifrSelfReportExcel").src = _url;
 }
@@ -1772,7 +1772,7 @@ function income_list_excel() {
     var _url;
 
     _retreat = $("#ContentPlaceHolder1_ddl_retreat").val();
-    _url = "/staff/in_ex_excel_export.aspx?ret=" + _retreat + "&type=1";
+    _url = "/staff/in_ex_excel_export?ret=" + _retreat + "&type=1";
         
     document.getElementById("ifrSelfReportExcel").src = _url;
 }
@@ -1782,7 +1782,7 @@ function expenses_all_print() {
     var win;
 
     _retreat = $("#ContentPlaceHolder1_ddl_retreat").val();
-    win = window.open("/staff/in_ex_all_print.aspx?ret=" + _retreat + "&type=2", "PopupWin", "width=800,height=900");
+    win = window.open("/staff/in_ex_all_print?ret=" + _retreat + "&type=2", "PopupWin", "width=800,height=900");
 
 }
 
@@ -1791,6 +1791,6 @@ function income_all_print() {
     var win;
 
     _retreat = $("#ContentPlaceHolder1_ddl_retreat").val();
-    win = window.open("/staff/in_ex_all_print.aspx?ret=" + _retreat + "&type=1", "PopupWin", "width=800,height=900");
+    win = window.open("/staff/in_ex_all_print?ret=" + _retreat + "&type=1", "PopupWin", "width=800,height=900");
 
 }

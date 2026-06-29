@@ -11,7 +11,7 @@ public partial class info_modify02 : System.Web.UI.Page
     public string my_question = string.Empty;    
     string _auth = string.Empty;
     string _login_id = string.Empty;
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower();
+    string _path = CodeHelper.GetCurrentCanonicalPath();
     #endregion
 
     protected void Page_Load(object sender, EventArgs e)
@@ -53,7 +53,7 @@ public partial class info_modify02 : System.Web.UI.Page
             if (result)
                 CodeHelper.Redirect("본인확인용 질문·답변이 새로 설정되었습니다.", "/");
             else
-                CodeHelper.Redirect("본인확인용 질문·답변 설정이 실패하였습니다!!\\n비밀번호가 맞게 입력되었는지 확인 바랍니다!!!", "/info/modify02.aspx");
+                CodeHelper.Redirect("본인확인용 질문·답변 설정이 실패하였습니다!!\\n비밀번호가 맞게 입력되었는지 확인 바랍니다!!!", "/info/modify02");
         }
         catch (Exception ex)
         {

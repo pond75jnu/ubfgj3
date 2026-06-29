@@ -10,7 +10,7 @@ public partial class staff_retreatdues : System.Web.UI.Page
 
     string _auth = string.Empty;
     string _login_id = string.Empty;
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower();
+    string _path = CodeHelper.GetCurrentCanonicalPath();
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -40,7 +40,7 @@ public partial class staff_retreatdues : System.Web.UI.Page
                         PageMode("MODIFY");
                     }
                     else
-                        Response.Redirect("/staff/retreatdues.aspx", false);
+                        Response.Redirect("/staff/retreatdues", false);
                 }
                 else
                     PageMode("LIST");
@@ -203,7 +203,7 @@ public partial class staff_retreatdues : System.Web.UI.Page
                 new SqlParameter("@user_id", SqlDbType.NVarChar, 50) { Value = _login_id },
                 new SqlParameter("@user_ip", SqlDbType.NVarChar, 45) { Value = CodeHelper.GetUserIP });
 
-            CodeHelper.Redirect("저장하였습니다.", "/staff/retreatdues.aspx");
+            CodeHelper.Redirect("저장하였습니다.", "/staff/retreatdues");
         }
         else if (mode.Equals("U"))
         {
@@ -217,7 +217,7 @@ public partial class staff_retreatdues : System.Web.UI.Page
                 new SqlParameter("@user_id", SqlDbType.NVarChar, 50) { Value = _login_id },
                 new SqlParameter("@user_ip", SqlDbType.NVarChar, 45) { Value = CodeHelper.GetUserIP });
 
-            CodeHelper.Redirect("수정하였습니다.", "/staff/retreatdues.aspx?mode=modify&seq=" + hdSeq.Value.Trim());
+            CodeHelper.Redirect("수정하였습니다.", "/staff/retreatdues?mode=modify&seq=" + hdSeq.Value.Trim());
         }
         else if (mode.Equals("D"))
         {
@@ -238,7 +238,7 @@ public partial class staff_retreatdues : System.Web.UI.Page
                     "ubfgj3.dbo.SP_staff_retreatdues_delete",
                     new SqlParameter("@seq", SqlDbType.Int) { Value = Convert.ToInt32(hdSeq.Value.ToString().Trim()) });
 
-                CodeHelper.Redirect("삭제하였습니다!", "/staff/retreatdues.aspx");
+                CodeHelper.Redirect("삭제하였습니다!", "/staff/retreatdues");
             }
             
         }
