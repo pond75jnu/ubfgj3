@@ -111,10 +111,10 @@ public partial class staff_status : System.Web.UI.Page
                             <a class='site-tab-link is-active' aria-current='page' href='javascript:;'>등록현황</a>
                         </li>
                         <li>
-                            <a class='site-tab-link' href='/staff/status.aspx?mode=2'>수입·지출현황</a>
+                            <a class='site-tab-link' href='/staff/status?mode=2'>수입·지출현황</a>
                         </li>
                         <li>
-                            <a class='site-tab-link' href='/staff/status.aspx?mode=3'>참석현황</a>
+                            <a class='site-tab-link' href='/staff/status?mode=3'>참석현황</a>
                         </li>
                     </ul>
         ";
@@ -295,7 +295,7 @@ public partial class staff_status : System.Web.UI.Page
                 {
                     _html_contents = _html_contents + @"
                     <table class='site-summary-table'>
-                        <caption><a href='/group/usermanage.aspx?ret=" + ddl_retreat.SelectedValue + @"&belong=" + ds.Tables[0].Rows[i]["seq"].ToString() + @"&reg=%'>" + _caption_title + @"</a></caption>
+                        <caption><a href='/group/usermanage?ret=" + ddl_retreat.SelectedValue + @"&belong=" + ds.Tables[0].Rows[i]["seq"].ToString() + @"&reg=%'>" + _caption_title + @"</a></caption>
                         <thead>
                     ";
                 }
@@ -443,13 +443,13 @@ public partial class staff_status : System.Web.UI.Page
         string _html_tab2 = @"
                     <ul class='site-tabs'>
                         <li>
-                            <a class='site-tab-link' href='/staff/status.aspx'>등록현황</a>
+                            <a class='site-tab-link' href='/staff/status'>등록현황</a>
                         </li>
                         <li>
                             <a class='site-tab-link is-active' aria-current='page' href='javascript:;'>수입·지출현황</a>
                         </li>
                         <li>
-                            <a class='site-tab-link' href='/staff/status.aspx?mode=3'>참석현황</a>
+                            <a class='site-tab-link' href='/staff/status?mode=3'>참석현황</a>
                         </li>
                     </ul>
         ";
@@ -502,10 +502,10 @@ public partial class staff_status : System.Web.UI.Page
         string _html_tab3 = @"
                     <ul class='site-tabs'>
                         <li>
-                            <a class='site-tab-link' href='/staff/status.aspx'>등록현황</a>
+                            <a class='site-tab-link' href='/staff/status'>등록현황</a>
                         </li>
                         <li>
-                            <a class='site-tab-link' href='/staff/status.aspx?mode=2'>수입·지출현황</a>
+                            <a class='site-tab-link' href='/staff/status?mode=2'>수입·지출현황</a>
                         </li>
                         <li>
                             <a class='site-tab-link is-active' aria-current='page' href='javascript:;'>참석현황</a>
@@ -667,7 +667,7 @@ public partial class staff_status : System.Web.UI.Page
                 {
                     _html_contents = _html_contents + @"
                     <table class='site-summary-table'>
-                        <caption><a href='/group/usermanage.aspx?ret=" + ddl_retreat.SelectedValue + @"&belong=" + ds.Tables[0].Rows[i]["seq"].ToString() + @"&reg=%'>" + _caption_title + @"</a></caption>
+                        <caption><a href='/group/usermanage?ret=" + ddl_retreat.SelectedValue + @"&belong=" + ds.Tables[0].Rows[i]["seq"].ToString() + @"&reg=%'>" + _caption_title + @"</a></caption>
                         <thead>
                     ";
                 }

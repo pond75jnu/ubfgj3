@@ -9,7 +9,8 @@ using System.Data.SqlClient;
 public partial class usercontrol_top_nav : System.Web.UI.UserControl
 {
     string _auth = UserInfo.UserRole.ToLower();    
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower().Replace("default.aspx", "");
+    string _path = CodeHelper.GetCurrentCanonicalPath();
+    string _menu_path = CodeHelper.GetCurrentMenuPath();
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -35,14 +36,14 @@ public partial class usercontrol_top_nav : System.Web.UI.UserControl
             ds1 = EfStoredProcedure.ExecuteDataSet(
                 "ubfgj3.dbo.SP_menu_top_nav_parent_sel",
                 new SqlParameter("@Auth", _auth),
-                new SqlParameter("@Path", _path));
+                new SqlParameter("@Path", _menu_path));
 
 
 
             StringBuilder sb = new StringBuilder();
             sb.Append("<ul class='site-nav-list'>");
 
-            if (ds1.Tables[0].Rows.Count > 0 && !_path.Equals("/member/login.aspx") && !_path.Equals("/member/join.aspx"))
+            if (ds1.Tables[0].Rows.Count > 0 && !_path.Equals("/member/login") && !_path.Equals("/member/join"))
             {
                 for (int i = 0; i < ds1.Tables[0].Rows.Count; i++)
                 {
@@ -50,10 +51,11 @@ public partial class usercontrol_top_nav : System.Web.UI.UserControl
                     {
                         sb.Append("<li class='site-nav-item site-nav-dropdown'>");
 
+                        string parentMenuUrl = CodeHelper.ToCanonicalUrl(ds1.Tables[0].Rows[i]["menu_path"].ToString());
                         if (ds1.Tables[0].Rows[i]["pathis"].ToString().Equals("Y"))
-                            sb.Append("<a class='site-nav-link site-nav-dropdown-toggle is-active' href='" + ds1.Tables[0].Rows[i]["menu_path"].ToString() + @"' ");
+                            sb.Append("<a class='site-nav-link site-nav-dropdown-toggle is-active' href='" + parentMenuUrl + @"' ");
                         else
-                            sb.Append("<a class='site-nav-link site-nav-dropdown-toggle' href='" + ds1.Tables[0].Rows[i]["menu_path"].ToString() + @"' ");
+                            sb.Append("<a class='site-nav-link site-nav-dropdown-toggle' href='" + parentMenuUrl + @"' ");
                         sb.Append("aria-expanded='false' data-site-dropdown-toggle>");
                         sb.Append(ds1.Tables[0].Rows[i]["menu_nm"].ToString());
                         sb.Append("</a>");
@@ -67,12 +69,14 @@ public partial class usercontrol_top_nav : System.Web.UI.UserControl
                         {
                             for (int j = 0; j < ds2.Tables[0].Rows.Count; j++)
                             {
-                                if (_path.Equals(ds2.Tables[0].Rows[j]["menu_path"].ToString().ToLower().Trim()))
+                                string childMenuUrl = CodeHelper.ToCanonicalUrl(ds2.Tables[0].Rows[j]["menu_path"].ToString());
+
+                                if (_path.Equals(CodeHelper.ToCanonicalPath(ds2.Tables[0].Rows[j]["menu_path"].ToString())))
                                     sb.Append("<li><a class='site-nav-dropdown-link is-active'");
                                 else
                                     sb.Append("<li><a class='site-nav-dropdown-link'");
 
-                                sb.Append("href='" + ds2.Tables[0].Rows[j]["menu_path"].ToString() + @"'>");
+                                sb.Append("href='" + childMenuUrl + @"'>");
                                 sb.Append(ds2.Tables[0].Rows[j]["menu_nm"].ToString());
                                 sb.Append("</a></li>");
                             }
@@ -85,7 +89,7 @@ public partial class usercontrol_top_nav : System.Web.UI.UserControl
                     {
                         sb.Append("<li class='site-nav-item'>");
 
-                        if (_path.Equals(ds1.Tables[0].Rows[i]["menu_path"].ToString().ToLower().Trim()))
+                        if (_path.Equals(CodeHelper.ToCanonicalPath(ds1.Tables[0].Rows[i]["menu_path"].ToString())))
                             sb.Append("<a class='site-nav-link is-active' href='/'>수양회정보</a>");
                         else
                             sb.Append("<a class='site-nav-link' href='/'>수양회정보</a>");
@@ -102,16 +106,16 @@ public partial class usercontrol_top_nav : System.Web.UI.UserControl
 
             if(UserInfo.UserID.ToLower().Equals("anonymous") || UserInfo.UserID.ToLower().Equals(""))
             {
-                sb.Append("<a href='/member/login.aspx' class='site-nav-action-link'>로그인</a>");
-                sb.Append("<a href='/member/join.aspx' class='site-nav-action-link site-nav-action-primary'>회원가입</a>");
+                sb.Append("<a href='/member/login' class='site-nav-action-link'>로그인</a>");
+                sb.Append("<a href='/member/join' class='site-nav-action-link site-nav-action-primary'>회원가입</a>");
             }
             else
             {
                 if (CanSwitchRetreat())
                     sb.Append("<button type='button' class='site-nav-action-link site-nav-switch-button' data-retreat-switch-open>수양회 전환</button>");
 
-                sb.Append("<a href='/info/modify01.aspx' class='site-nav-action-link'>" + UserInfo.LoginUserKOR_NM + @"(" + UserInfo.RoleDesc(UserInfo.UserId(UserInfo.UserID)) + @")</a>");
-                sb.Append("<a href='/member/logout.aspx' class='site-nav-action-link site-nav-action-primary'>로그아웃</a>");
+                sb.Append("<a href='/info/modify01' class='site-nav-action-link'>" + UserInfo.LoginUserKOR_NM + @"(" + UserInfo.RoleDesc(UserInfo.UserId(UserInfo.UserID)) + @")</a>");
+                sb.Append("<a href='/member/logout' class='site-nav-action-link site-nav-action-primary'>로그아웃</a>");
 
                 SetBelong();
             }
@@ -208,7 +212,7 @@ public partial class usercontrol_top_nav : System.Web.UI.UserControl
                 new SqlParameter("@UIP", CodeHelper.GetUserIP));
 
             SetBelong();
-            CodeHelper.Redirect("수양회를 전환하였습니다.", Request.RawUrl);
+            CodeHelper.Redirect("수양회를 전환하였습니다.", CodeHelper.ToCanonicalUrl(Request.RawUrl));
         }
         catch (Exception ex)
         {
@@ -226,7 +230,7 @@ public partial class usercontrol_top_nav : System.Web.UI.UserControl
             {
                 DataSet ds = EfStoredProcedure.ExecuteDataSet(
                     "ubfgj3.dbo.SP_menu_auth_by_path_sel",
-                    new SqlParameter("@Path", _path.ToLower()));
+                    new SqlParameter("@Path", _menu_path.ToLower()));
 
                 if (ds.Tables[0].Rows.Count > 0)
                 {

@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 
 public partial class usercontrol_page_header : System.Web.UI.UserControl
 {    
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower().Replace("default.aspx", "");
+    string _menu_path = CodeHelper.GetCurrentMenuPath();
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -31,7 +31,7 @@ public partial class usercontrol_page_header : System.Web.UI.UserControl
 
             ds1 = EfStoredProcedure.ExecuteDataSet(
                 "ubfgj3.dbo.SP_menu_breadcrumb_current_sel",
-                new SqlParameter("@Path", _path));
+                new SqlParameter("@Path", _menu_path));
 
             if (ds1.Tables[0].Rows.Count > 0)
             {
@@ -43,7 +43,7 @@ public partial class usercontrol_page_header : System.Web.UI.UserControl
                         "ubfgj3.dbo.SP_menu_by_seq_sel",
                         new SqlParameter("@Seq", ds1.Tables[0].Rows[0]["parent_seq"].ToString()));
 
-                    sb.Append("<li><a href='" + ds2.Tables[0].Rows[0]["menu_path"].ToString() + @"' class='site-breadcrumb-link'>" + ds2.Tables[0].Rows[0]["menu_nm"].ToString() + @"</a></li>");
+                    sb.Append("<li><a href='" + CodeHelper.ToCanonicalUrl(ds2.Tables[0].Rows[0]["menu_path"].ToString()) + @"' class='site-breadcrumb-link'>" + ds2.Tables[0].Rows[0]["menu_nm"].ToString() + @"</a></li>");
                     sb.Append("<li class='is-active' aria-current='page'>" + ds1.Tables[0].Rows[0]["menu_nm"].ToString() + @"</li>");
                 }
                 else if (ds1.Tables[0].Rows[0]["menu_depth"].ToString().Equals("0"))
@@ -109,7 +109,7 @@ public partial class usercontrol_page_header : System.Web.UI.UserControl
     {
         DataSet ds = EfStoredProcedure.ExecuteDataSet(
             "ubfgj3.dbo.SP_menu_breadcrumb_current_sel",
-            new SqlParameter("@Path", _path));
+            new SqlParameter("@Path", _menu_path));
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return true;

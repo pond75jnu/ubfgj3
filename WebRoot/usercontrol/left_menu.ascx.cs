@@ -8,7 +8,8 @@ using System.Data.SqlClient;
 public partial class usercontrol_left_menu : System.Web.UI.UserControl
 {
     string _auth = UserInfo.UserRole.ToLower();
-    string _path = HttpContext.Current.Request.Url.AbsolutePath.ToLower().Replace("default.aspx", "");
+    string _path = CodeHelper.GetCurrentCanonicalPath();
+    string _menu_path = CodeHelper.GetCurrentMenuPath();
 
     string m_Retreat = string.Empty;
     string m_Belong = string.Empty;
@@ -56,13 +57,13 @@ public partial class usercontrol_left_menu : System.Web.UI.UserControl
         if (!Page.IsPostBack)
         {
 
-            if (_path.Equals("/group/usermanage.aspx") || _path.Equals("/staff/registatus.aspx"))
+            if (_menu_path.Equals("/group/usermanage.aspx") || _menu_path.Equals("/staff/registatus.aspx"))
                 GetRegistInfo();
 
-            if (_path.Equals("/staff/expenses.aspx"))
+            if (_menu_path.Equals("/staff/expenses.aspx"))
                 GetExpenses();
 
-            if (_path.Equals("/staff/income.aspx"))
+            if (_menu_path.Equals("/staff/income.aspx"))
                 GetIncome();
 
             SetMenu();
@@ -77,7 +78,7 @@ public partial class usercontrol_left_menu : System.Web.UI.UserControl
             
             DataSet ds = EfStoredProcedure.ExecuteDataSet(
                 "ubfgj3.dbo.SP_menu_left_by_path_auth_sel",
-                new SqlParameter("@Path", _path),
+                new SqlParameter("@Path", _menu_path),
                 new SqlParameter("@Auth", _auth));
 
 
@@ -93,9 +94,9 @@ public partial class usercontrol_left_menu : System.Web.UI.UserControl
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
                     _menu_nm = ds.Tables[0].Rows[i]["menu_nm"].ToString().Trim();
-                    _menu_link = ds.Tables[0].Rows[i]["menu_path"].ToString().Trim().ToLower();
+                    _menu_link = CodeHelper.ToCanonicalUrl(ds.Tables[0].Rows[i]["menu_path"].ToString().Trim().ToLower());
 
-                    if (ds.Tables[0].Rows[i]["menu_path"].ToString().Trim().ToLower().Equals(_path))
+                    if (CodeHelper.ToCanonicalPath(ds.Tables[0].Rows[i]["menu_path"].ToString().Trim()).Equals(_path))
                         sb.Append("<li><a href='" + _menu_link + @"' class='site-side-link is-active'><span>" + _menu_nm + @"</span></a></li>");
                     else
                         sb.Append("<li><a href='" + _menu_link + @"' class='site-side-link'><span>" + _menu_nm + @"</span></a></li>");
@@ -105,7 +106,7 @@ public partial class usercontrol_left_menu : System.Web.UI.UserControl
 
             sb.Append("</ul></nav>");
 
-            if (_path.Equals("/group/usermanage.aspx") || _path.Equals("/staff/registatus.aspx"))
+            if (_menu_path.Equals("/group/usermanage.aspx") || _menu_path.Equals("/staff/registatus.aspx"))
             {
                 string _caption = !m_Belong.Equals("%") ? CodeHelper.GetGroupName(m_Belong) + " 등록현황" : "전체 등록현황";
                 string _table_html = @"
@@ -187,13 +188,13 @@ public partial class usercontrol_left_menu : System.Web.UI.UserControl
     </table>
                 ";
 
-                if (_path.Equals("/group/usermanage.aspx"))
+                if (_menu_path.Equals("/group/usermanage.aspx"))
                     sb = new StringBuilder(); //구성원·등록관리 메뉴인 경우 왼쪽 서브메뉴 필요없음
 
                 sb.Append(_table_html);
             }
 
-            if (_path.Equals("/staff/expenses.aspx"))
+            if (_menu_path.Equals("/staff/expenses.aspx"))
             {
                 string _table_expenses_html = @"
     <table class='site-summary-table'>
@@ -224,7 +225,7 @@ public partial class usercontrol_left_menu : System.Web.UI.UserControl
                 sb.Append(_table_expenses_html);
             }
 
-            if (_path.Equals("/staff/income.aspx"))
+            if (_menu_path.Equals("/staff/income.aspx"))
             {
                 string _table_income_html = @"
     <table class='site-summary-table'>

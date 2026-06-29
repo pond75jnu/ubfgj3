@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using System.Web.Hosting;
 using System.Web.UI;
 using System.Data;
 using System.Data.SqlClient;
@@ -19,6 +21,132 @@ public class CodeHelper
         //
         // TODO: 여기에 생성자 논리를 추가합니다.
         //
+    }
+
+    public static string GetCurrentCanonicalPath()
+    {
+        HttpContext ctx = HttpContext.Current;
+        if (ctx == null || ctx.Request == null || ctx.Request.Url == null)
+            return "/";
+
+        return ToCanonicalPath(ctx.Request.Url.AbsolutePath);
+    }
+
+    public static string GetCurrentMenuPath()
+    {
+        HttpContext ctx = HttpContext.Current;
+        if (ctx == null || ctx.Request == null || ctx.Request.Url == null)
+            return "/";
+
+        return ToMenuPath(ctx.Request.Url.AbsolutePath);
+    }
+
+    public static string ToCanonicalPath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return "/";
+
+        string normalized = path.Trim().Replace('\\', '/');
+        int queryIndex = normalized.IndexOf('?');
+        if (queryIndex >= 0)
+            normalized = normalized.Substring(0, queryIndex);
+
+        int hashIndex = normalized.IndexOf('#');
+        if (hashIndex >= 0)
+            normalized = normalized.Substring(0, hashIndex);
+
+        if (!normalized.StartsWith("/"))
+            normalized = "/" + normalized;
+
+        normalized = normalized.ToLowerInvariant();
+
+        if (normalized.Equals("/default.aspx") || normalized.Equals("/default"))
+            return "/";
+
+        if (normalized.EndsWith(".aspx", StringComparison.OrdinalIgnoreCase))
+            normalized = normalized.Substring(0, normalized.Length - ".aspx".Length);
+
+        return normalized.Equals(string.Empty) ? "/" : normalized;
+    }
+
+    public static string ToMenuPath(string path)
+    {
+        string canonicalPath = ToCanonicalPath(path);
+        if (canonicalPath.Equals("/"))
+            return "/";
+
+        string aspxPath = canonicalPath + ".aspx";
+        if (VirtualAspxExists(aspxPath))
+            return aspxPath;
+
+        return canonicalPath;
+    }
+
+    public static string ToCanonicalUrl(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return url;
+
+        Uri absoluteUri;
+        if (Uri.TryCreate(url, UriKind.Absolute, out absoluteUri))
+        {
+            return absoluteUri.GetLeftPart(UriPartial.Authority)
+                + ToCanonicalPath(absoluteUri.AbsolutePath)
+                + absoluteUri.Query
+                + absoluteUri.Fragment;
+        }
+
+        string fragment = string.Empty;
+        string pathAndQuery = url.Trim();
+        int hashIndex = pathAndQuery.IndexOf('#');
+        if (hashIndex >= 0)
+        {
+            fragment = pathAndQuery.Substring(hashIndex);
+            pathAndQuery = pathAndQuery.Substring(0, hashIndex);
+        }
+
+        string query = string.Empty;
+        string path = pathAndQuery;
+        int queryIndex = pathAndQuery.IndexOf('?');
+        if (queryIndex >= 0)
+        {
+            query = pathAndQuery.Substring(queryIndex);
+            path = pathAndQuery.Substring(0, queryIndex);
+        }
+
+        bool isRelativePath = !path.StartsWith("/");
+        string canonicalPath = ToCanonicalPath(isRelativePath ? "/" + path : path);
+        if (isRelativePath)
+            canonicalPath = canonicalPath.TrimStart('/');
+
+        return canonicalPath + query + fragment;
+    }
+
+    private static bool VirtualAspxExists(string virtualPath)
+    {
+        try
+        {
+            if (HostingEnvironment.VirtualPathProvider != null
+                && HostingEnvironment.VirtualPathProvider.FileExists(virtualPath))
+                return true;
+        }
+        catch
+        {
+        }
+
+        try
+        {
+            HttpContext ctx = HttpContext.Current;
+            if (ctx == null)
+                return false;
+
+            string physicalPath = ctx.Server.MapPath(virtualPath);
+            return File.Exists(physicalPath);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public enum MessageType
@@ -36,6 +164,7 @@ public class CodeHelper
 
         ctx.Response.Clear();
 
+        url = ToCanonicalUrl(url);
         string SCRIPT_MESSAGE_REDIRECT = @"<script language='javascript'>alert('{0}'); window.location='{1}';</script>";
         ctx.Response.Write(String.Format(SCRIPT_MESSAGE_REDIRECT, message, url));
 
@@ -48,6 +177,7 @@ public class CodeHelper
 
         ctx.Response.Clear();
 
+        url = ToCanonicalUrl(url);
         string SCRIPT_REDIRECT = @"<script language='javascript'>window.location='{0}';</script>";
         ctx.Response.Write(String.Format(SCRIPT_REDIRECT, url));
 
@@ -245,7 +375,7 @@ public class CodeHelper
     {
         DataSet ds = EfStoredProcedure.ExecuteDataSet(
             "ubfgj3.dbo.SP_menu_page_title_sel",
-            new SqlParameter("@MenuPath", _menu_path.ToLower()));
+            new SqlParameter("@MenuPath", ToMenuPath(_menu_path).ToLower()));
 
         if (ds.Tables[0].Rows.Count > 0)
         {
