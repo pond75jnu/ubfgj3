@@ -20,7 +20,7 @@
         }
 
         .site-status-main {
-            padding: 0 48px 0 32px;
+            padding: 0 20px;
         }
 
         .site-status-control-card {

@@ -1410,7 +1410,7 @@ textarea.ui-input {
 
     .site-shell .site-sidebar ~ * {
         min-width: 0;
-        padding: 0 48px 0 32px !important;
+        padding: 0 20px !important;
     }
 
     .site-shell .site-sidebar ~ [class*="rounded"],
@@ -1418,7 +1418,7 @@ textarea.ui-input {
         border: 0 !important;
         border-radius: 0 !important;
         background: transparent !important;
-        padding: 0 48px 0 32px !important;
+        padding: 0 20px !important;
         box-shadow: none !important;
     }
 }
@@ -2302,7 +2302,7 @@ textarea.ui-input {
 }
 
 .site-usermanage .site-content-main {
-    padding: 0 48px 0 32px;
+    padding: 0 20px;
 }
 
 .site-usermanage-control-card {
@@ -2630,7 +2630,7 @@ textarea.ui-input {
 }
 
 .site-info-main {
-    padding: 0 48px 0 32px;
+    padding: 0 20px;
 }
 
 .site-info-card {
