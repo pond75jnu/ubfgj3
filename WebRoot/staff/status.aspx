@@ -9,14 +9,14 @@
         }
 
         .site-status-page .site-layout-row {
-            grid-template-columns: 240px minmax(0, 1fr);
+            grid-template-columns: 340px minmax(0, 1fr);
             gap: 0;
         }
 
         .site-status-page .site-layout-row > .site-sidebar {
-            width: 240px;
-            padding-left: 24px;
-            padding-right: 2px;
+            width: 340px;
+            padding-left: 10px;
+            padding-right: 10px;
         }
 
         .site-status-main {
@@ -107,20 +107,20 @@
 
         .site-status-summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, 214px);
+            grid-template-columns: repeat(auto-fill, 320px);
             align-items: start;
             gap: 14px;
         }
 
         .site-status-summary-cell {
-            width: 214px;
+            width: 320px;
             min-width: 0;
         }
 
         .site-status-summary-cell .site-summary-table {
             width: auto;
-            min-width: 214px;
-            max-width: 214px;
+            min-width: 320px;
+            max-width: 320px;
             margin: 0;
             table-layout: auto;
             border-color: #d8dee8;
@@ -129,7 +129,7 @@
         .site-status-summary-cell .site-summary-table caption {
             padding: 8px 2px 7px;
             color: #111827;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             line-height: 1.2;
             white-space: nowrap;
@@ -149,7 +149,7 @@
         .site-status-summary-cell .site-summary-table th,
         .site-status-summary-cell .site-summary-table td {
             padding: 5px 2px !important;
-            font-size: 11px !important;
+            font-size: 12px !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
         }
@@ -157,7 +157,7 @@
         .site-status-summary-cell .site-summary-table thead th {
             background: #111827;
             color: #fff;
-            font-size: 10px !important;
+            font-size: 11px !important;
             font-weight: 700;
             letter-spacing: 0;
         }

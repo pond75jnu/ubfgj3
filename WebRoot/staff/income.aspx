@@ -12,7 +12,7 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <div class="mx-auto w-full max-w-[1440px] px-4 pb-12 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
             <ubfgj3_uc:left_menu ID="id_left_menu" runat="server" />
             <div class="min-w-0 space-y-6">
                 <div class="border-b border-hairline pb-4">
@@ -207,5 +207,4 @@
         </div>
     </div>
 </asp:Content>
-
 

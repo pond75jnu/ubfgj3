@@ -6,7 +6,7 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
     <div class="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
             <ubfgj3_uc:left_menu ID="id_left_menu" runat="server" />
             <div class="min-w-0 rounded-[18px] border border-hairline bg-white p-4 sm:p-6">
                 <h5 class="text-[21px] font-semibold text-ink"><asp:Label ID="lblPageTitle" runat="server"></asp:Label></h5>
