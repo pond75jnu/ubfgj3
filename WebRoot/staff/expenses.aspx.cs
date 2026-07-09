@@ -304,8 +304,6 @@ public partial class staff_expenses : System.Web.UI.Page
 
     protected void SetData(string mode)
     {
-        decimal _expense = CodeHelper.ParsePositiveWholeWon(hdExpenses.Value, "지출비용");
-
         string _file_org_full_nm = string.Empty;
         string _file_org_nm = string.Empty;
         string _file_org_extention = string.Empty;
@@ -331,6 +329,8 @@ public partial class staff_expenses : System.Web.UI.Page
 
         if (mode.Equals("C"))
         {
+            decimal _expense = CodeHelper.ParsePositiveWholeWon(hdExpenses.Value, "지출비용");
+
             EfStoredProcedure.ExecuteNonQuery(
                 "ubfgj3.dbo.SP_staff_payment_insert",
                 new SqlParameter("@retreat", SqlDbType.Int) { Value = Convert.ToInt32(hdRetreat.Value.Trim()) },
@@ -355,6 +355,8 @@ public partial class staff_expenses : System.Web.UI.Page
         }
         else if (mode.Equals("U"))
         {
+            decimal _expense = CodeHelper.ParsePositiveWholeWon(hdExpenses.Value, "지출비용");
+
             _attatch_file_full_path = CodeHelper.GetFilePath(hdSeq.Value.ToString().Trim());
 
             //새로 파일 첨부시
