@@ -109,6 +109,7 @@
 - `Global.asax`는 애플리케이션 시작 시 `WebRoot` 아래의 `.aspx` 파일을 스캔해 extensionless route를 등록한다.
   - 예: `staff/income.aspx` -> `/staff/income`
   - `Default.aspx`는 별도 route를 만들지 않고 `/`를 canonical로 둔다.
+- FTP 배포 후 앱 도메인이 재시작되지 않아 새 `.aspx` 파일의 route가 아직 등록되지 않은 경우를 대비해, `Application_BeginRequest`에서 extensionless 경로와 같은 이름의 `.aspx` 파일이 있으면 요청 시점에 해당 파일로 rewrite한다.
 - `.aspx`로 직접 접근하면 canonical URL로 리다이렉트한다.
   - `GET`, `HEAD`: `Response.RedirectPermanent(..., false)`로 301 처리
   - 그 외 메서드: status `308`과 `RedirectLocation`으로 처리

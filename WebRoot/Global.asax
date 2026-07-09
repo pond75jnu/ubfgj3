@@ -12,7 +12,10 @@
 
     protected void Application_BeginRequest(object sender, EventArgs e)
     {
-        RedirectToCanonicalUrl();
+        if (RedirectToCanonicalUrl())
+            return;
+
+        RewriteExtensionlessAspxUrl();
     }
 
     private static void RegisterExtensionlessRoutes(RouteCollection routes)
@@ -38,11 +41,11 @@
         }
     }
 
-    private void RedirectToCanonicalUrl()
+    private bool RedirectToCanonicalUrl()
     {
         HttpContext ctx = HttpContext.Current;
         if (ctx == null || ctx.Request == null || ctx.Response == null)
-            return;
+            return false;
 
         string path = ctx.Request.Url.AbsolutePath;
         bool isAspxPath = path.EndsWith(".aspx", StringComparison.OrdinalIgnoreCase);
@@ -50,11 +53,11 @@
             && !path.Equals("/", StringComparison.Ordinal);
 
         if (!isAspxPath && !isDefaultPath)
-            return;
+            return false;
 
         string canonicalUrl = CodeHelper.ToCanonicalUrl(ctx.Request.RawUrl);
         if (canonicalUrl.Equals(ctx.Request.RawUrl, StringComparison.OrdinalIgnoreCase))
-            return;
+            return false;
 
         if (ctx.Request.HttpMethod.Equals("GET", StringComparison.OrdinalIgnoreCase)
             || ctx.Request.HttpMethod.Equals("HEAD", StringComparison.OrdinalIgnoreCase))
@@ -68,5 +71,39 @@
         }
 
         ctx.ApplicationInstance.CompleteRequest();
+        return true;
+    }
+
+    private void RewriteExtensionlessAspxUrl()
+    {
+        HttpContext ctx = HttpContext.Current;
+        if (ctx == null || ctx.Request == null || ctx.Response == null)
+            return;
+
+        string path = ctx.Request.Url.AbsolutePath;
+        if (path.Equals("/", StringComparison.Ordinal) || path.EndsWith(".aspx", StringComparison.OrdinalIgnoreCase))
+            return;
+
+        if (!string.IsNullOrEmpty(Path.GetExtension(path)))
+            return;
+
+        string canonicalPath = CodeHelper.ToCanonicalPath(path);
+        if (canonicalPath.Equals("/", StringComparison.Ordinal))
+            return;
+
+        string appRoot = HttpRuntime.AppDomainAppPath;
+        if (string.IsNullOrEmpty(appRoot))
+            return;
+
+        string relativePath = canonicalPath.TrimStart('/') + ".aspx";
+        string physicalPath = Path.Combine(appRoot, relativePath.Replace('/', Path.DirectorySeparatorChar));
+        if (!File.Exists(physicalPath))
+            return;
+
+        string query = ctx.Request.Url.Query;
+        if (query.StartsWith("?", StringComparison.Ordinal))
+            query = query.Substring(1);
+
+        ctx.RewritePath("~/" + relativePath, string.Empty, query, false);
     }
 </script>
