@@ -712,11 +712,6 @@ function uConfirm_expenses() {
         $("#ContentPlaceHolder1_txtRetreatDuesNM").focus();
         return false;
     }
-    else if (_expenses == "") {
-        alert("지출비용을 입력하지 않았습니다.");
-        $("#ContentPlaceHolder1_txtPayment").focus();
-        return false;
-    }
     else if (_expenses_dt == "") {
         alert("지출일자를 입력하지 않았습니다.");
         $("#ContentPlaceHolder1_txtRetreatDues").focus();
