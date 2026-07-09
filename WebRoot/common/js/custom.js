@@ -712,7 +712,7 @@ function uConfirm_expenses() {
         $("#ContentPlaceHolder1_txtRetreatDuesNM").focus();
         return false;
     }
-    else if (_expenses == "" || _expenses == "0") {
+    else if (_expenses == "") {
         alert("지출비용을 입력하지 않았습니다.");
         $("#ContentPlaceHolder1_txtPayment").focus();
         return false;

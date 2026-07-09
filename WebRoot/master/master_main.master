@@ -35,7 +35,7 @@
             <ubfgj3_uc:footer ID="id_footer" runat="server" />
             <script src="/common/js/jquery-3.6.0.min.js"></script>
             <script src="/Common/js/jquery-ui-1.13.1.min.js"></script>
-            <script src="/common/js/custom.js?v=tailwind-21"></script>
+            <script src="/common/js/custom.js?v=tailwind-22"></script>
 
         </main>
 

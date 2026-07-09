@@ -302,6 +302,14 @@ public partial class staff_expenses : System.Web.UI.Page
 
     
 
+    private decimal ParseRequiredWholeWon(string value, string fieldName)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException(fieldName + "을(를) 입력해야 합니다.");
+
+        return CodeHelper.ParseWholeWon(value, fieldName);
+    }
+
     protected void SetData(string mode)
     {
         string _file_org_full_nm = string.Empty;
@@ -329,7 +337,7 @@ public partial class staff_expenses : System.Web.UI.Page
 
         if (mode.Equals("C"))
         {
-            decimal _expense = CodeHelper.ParsePositiveWholeWon(hdExpenses.Value, "지출비용");
+            decimal _expense = ParseRequiredWholeWon(hdExpenses.Value, "지출비용");
 
             EfStoredProcedure.ExecuteNonQuery(
                 "ubfgj3.dbo.SP_staff_payment_insert",
@@ -355,7 +363,7 @@ public partial class staff_expenses : System.Web.UI.Page
         }
         else if (mode.Equals("U"))
         {
-            decimal _expense = CodeHelper.ParsePositiveWholeWon(hdExpenses.Value, "지출비용");
+            decimal _expense = ParseRequiredWholeWon(hdExpenses.Value, "지출비용");
 
             _attatch_file_full_path = CodeHelper.GetFilePath(hdSeq.Value.ToString().Trim());
 

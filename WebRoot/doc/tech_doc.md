@@ -21,7 +21,7 @@
 - `migration_plan.md`의 방향대로 Bootstrap 기반 공통 레이아웃을 Tailwind 기반 구조로 전환했다.
 - `WebRoot/master/master_main.master`에서 Bootstrap CSS/JS와 Bootstrap Icons 의존 로드를 제거했다.
 - Tailwind CDN 런타임은 사용하지 않고, `DESIGN.md` 기준 토큰으로 생성한 로컬 CSS `WebRoot/common/css/tailwind.css`를 로드한다.
-- 현재 공통 CSS/JS 캐시 버전은 `tailwind.css?v=tailwind-02`, `custom.css?v=tailwind-48`, `custom.js?v=tailwind-21`이다.
+- 현재 공통 CSS/JS 캐시 버전은 `tailwind.css?v=tailwind-02`, `custom.css?v=tailwind-48`, `custom.js?v=tailwind-22`이다.
 - Pretendard GOV 고정(static) dynamic subset 웹폰트를 사용한다.
 - `custom.css`는 `DESIGN.md`의 Action Blue, hairline border, neutral background, restrained radius 원칙을 기준으로 공통 화면을 보정한다.
 - Web Forms 기존 화면에 남아 있는 `btn`, `form-control`, `form-select`, `table`, `card`, `badge`, `alert` 계열 클래스는 공통 CSS에서 호환 스타일로 흡수한다.
