@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="/common/css/jquery-ui.1.13.1.css" />
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov-dynamic-subset.min.css" />
     <link rel="stylesheet" href="/common/css/tailwind.css?v=tailwind-02" />
-    <link rel="stylesheet" href="/common/css/custom.css?v=tailwind-46" />
+    <link rel="stylesheet" href="/common/css/custom.css?v=tailwind-48" />
 
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
@@ -35,7 +35,7 @@
             <ubfgj3_uc:footer ID="id_footer" runat="server" />
             <script src="/common/js/jquery-3.6.0.min.js"></script>
             <script src="/Common/js/jquery-ui-1.13.1.min.js"></script>
-            <script src="/common/js/custom.js?v=tailwind-19"></script>
+            <script src="/common/js/custom.js?v=tailwind-21"></script>
 
         </main>
 

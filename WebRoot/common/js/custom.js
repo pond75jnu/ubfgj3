@@ -158,6 +158,161 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+    var modal = document.querySelector("[data-retreat-program-modal]");
+    if (!modal) {
+        return;
+    }
+
+    var openLinks = document.querySelectorAll("[data-retreat-program-open]");
+    var closeButtons = modal.querySelectorAll("[data-retreat-program-close]");
+    var dialog = modal.querySelector("[data-retreat-program-dialog]");
+    var frame = modal.querySelector("[data-retreat-program-frame]");
+    var closeButton = modal.querySelector(".site-program-close");
+    var lastActiveElement = null;
+    var desktopModalQuery = window.matchMedia("(min-width: 834px)");
+
+    function setDialogToolsEnabled(enabled) {
+        if (!window.jQuery || !dialog) {
+            return;
+        }
+
+        var $dialog = window.jQuery(dialog);
+
+        if ($dialog.data("ui-draggable")) {
+            $dialog.draggable(enabled ? "enable" : "disable");
+        }
+
+        if ($dialog.data("ui-resizable")) {
+            $dialog.resizable(enabled ? "enable" : "disable");
+        }
+    }
+
+    function resetDialogForMobile() {
+        if (!dialog) {
+            return;
+        }
+
+        dialog.style.left = "";
+        dialog.style.top = "";
+        dialog.style.width = "";
+        dialog.style.height = "";
+    }
+
+    function initDialogTools() {
+        if (!window.jQuery || !window.jQuery.fn.draggable || !window.jQuery.fn.resizable || !dialog) {
+            return;
+        }
+
+        var $dialog = window.jQuery(dialog);
+
+        if (!$dialog.data("retreat-program-tools-ready")) {
+            $dialog.draggable({
+                handle: ".site-program-header",
+                cancel: ".site-program-close, .site-program-actions, a, button, iframe",
+                containment: "window",
+                start: function () {
+                    dialog.classList.add("ui-draggable-dragging");
+                },
+                stop: function () {
+                    dialog.classList.remove("ui-draggable-dragging");
+                }
+            });
+
+            $dialog.resizable({
+                handles: "n,e,s,w,se,sw,ne,nw",
+                minWidth: 420,
+                minHeight: 360,
+                start: function () {
+                    $dialog.resizable("option", "maxWidth", Math.max(420, window.innerWidth - 24));
+                    $dialog.resizable("option", "maxHeight", Math.max(360, window.innerHeight - 24));
+                    dialog.classList.add("ui-resizable-resizing");
+                },
+                stop: function () {
+                    dialog.classList.remove("ui-resizable-resizing");
+                }
+            });
+
+            $dialog.data("retreat-program-tools-ready", true);
+        }
+
+        if (desktopModalQuery.matches) {
+            setDialogToolsEnabled(true);
+        } else {
+            setDialogToolsEnabled(false);
+            resetDialogForMobile();
+        }
+    }
+
+    function openModal(event, link) {
+        if (event) {
+            event.preventDefault();
+        }
+
+        lastActiveElement = link || document.activeElement;
+
+        if (frame) {
+            frame.setAttribute("src", (link && link.getAttribute("href")) || "/retreat_program");
+        }
+
+        modal.style.display = "flex";
+        modal.classList.add("is-open");
+        document.body.classList.add("site-modal-open");
+        initDialogTools();
+
+        if (closeButton) {
+            closeButton.focus();
+        }
+    }
+
+    function closeModal() {
+        modal.classList.remove("is-open");
+        modal.style.display = "none";
+        document.body.classList.remove("site-modal-open");
+
+        if (frame) {
+            frame.setAttribute("src", "about:blank");
+        }
+
+        if (lastActiveElement && typeof lastActiveElement.focus === "function") {
+            lastActiveElement.focus();
+        }
+    }
+
+    openLinks.forEach(function (link) {
+        link.addEventListener("click", function (event) {
+            openModal(event, link);
+        });
+    });
+
+    closeButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            closeModal();
+        });
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && modal.classList.contains("is-open")) {
+            closeModal();
+        }
+    });
+
+    function handleModalViewportChange() {
+        if (desktopModalQuery.matches) {
+            setDialogToolsEnabled(true);
+        } else {
+            setDialogToolsEnabled(false);
+            resetDialogForMobile();
+        }
+    }
+
+    if (typeof desktopModalQuery.addEventListener === "function") {
+        desktopModalQuery.addEventListener("change", handleModalViewportChange);
+    } else if (typeof desktopModalQuery.addListener === "function") {
+        desktopModalQuery.addListener(handleModalViewportChange);
+    }
+});
+
 function confirmRetreatSwitch() {
     var select = document.querySelector("[data-retreat-switch-modal] select");
     if (!select || select.value === "") {

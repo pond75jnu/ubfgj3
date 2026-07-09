@@ -24,10 +24,8 @@ public partial class _Default : System.Web.UI.Page
 
             if (ds.Tables[0].Rows.Count > 0)
             {
-                if (ds.Tables[0].Rows[0]["file_nm"].ToString().Trim().Equals(string.Empty))
-                    btnFileDown.Enabled = false;
-                else
-                    btnFileDown.Enabled = true;
+                btnProgramView.Visible = !ds.Tables[0].Rows[0]["file_nm"].ToString().Trim().Equals(string.Empty);
+                btnProgramView.HRef = CodeHelper.ToCanonicalUrl("/retreat_program");
 
                 _retreat_seq = ds.Tables[0].Rows[0]["seq"].ToString();
                 mTitle.InnerHtml = ds.Tables[0].Rows[0]["retreat_name"].ToString();
@@ -80,28 +78,6 @@ public partial class _Default : System.Web.UI.Page
         catch (Exception ex)
         {
             Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "Alert", "<script>alert('수양회 정보 조회 중 에러 발생 : " + Server.HtmlEncode(ex.Message) + @"');</script>");
-        }
-    }
-
-    protected void btnFileDown_Click(object sender, EventArgs e)
-    {
-        try
-        {
-            DataSet ds = EfStoredProcedure.ExecuteDataSet("ubfgj3.dbo.SP_retreat_active_file_sel");
-
-            string fileName = ds.Tables[0].Rows[0]["file_nm"].ToString();
-            byte[] byteFile = (byte[])ds.Tables[0].Rows[0]["file_data"];
-
-            Response.Clear();
-            Response.ContentType = "Application/UnKnown";//파일열기,저장,취소확인창띄우기"Application/Octet-Stream"
-
-            Response.AppendHeader("Content-Disposition", "Attachment; Filename=" + Server.UrlEncode(fileName));
-            Response.AppendHeader("Content-Length", byteFile.Length.ToString());
-            Response.BinaryWrite(byteFile);
-        }
-        catch (Exception ex)
-        {
-            Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "Alert", "<script>alert('다운로드 중 에러 발생 : " + Server.HtmlEncode(ex.Message) + @"');</script>");
         }
     }
 
