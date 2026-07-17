@@ -521,6 +521,8 @@ public partial class staff_mealstatus : Page
             lblDetailMeta.Text = (isManual ? "수량 직접입력 · " : String.Empty)
                 + "명단 " + Convert.ToInt32(meta["member_count"], CultureInfo.InvariantCulture) + "명 · "
                 + GetStatusText(Convert.ToString(meta["submission_status"]));
+            lnkEditMeal.HRef = "/meal-precheck?group=" + belong.ToString(CultureInfo.InvariantCulture);
+            lnkEditMeal.Attributes["aria-label"] = Convert.ToString(meta["belong_nm"]) + " 식사인원 수정";
             litDetail.Text = BuildDetailHtml(data.Tables[1], data.Tables[2], data.Tables[3], data.Tables[4]);
             pnlDetailModal.Attributes["data-meal-return-group"] = belong.ToString(CultureInfo.InvariantCulture);
             pnlDetailModal.Visible = true;

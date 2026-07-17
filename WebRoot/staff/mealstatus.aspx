@@ -3,8 +3,8 @@
 <%@ Register TagPrefix="ubfgj3_uc" TagName="left_menu" Src="~/userControl/left_menu.ascx" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <link rel="stylesheet" href="/common/css/meal-precheck.css?v=meal-precheck-08" />
-    <script defer src="/common/js/meal-precheck.js?v=meal-precheck-08"></script>
+    <link rel="stylesheet" href="/common/css/meal-precheck.css?v=meal-precheck-10" />
+    <script defer src="/common/js/meal-precheck.js?v=meal-precheck-10"></script>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
@@ -75,6 +75,7 @@
                     <p class="site-meal-modal-kicker">요회별 상세</p>
                     <h2 id="mealDetailTitle"><asp:Label ID="lblDetailTitle" runat="server" /></h2>
                     <asp:Label ID="lblDetailMeta" runat="server" CssClass="site-meal-modal-meta" />
+                    <a id="lnkEditMeal" runat="server" class="site-button site-button-secondary site-meal-modal-edit-link">식사인원 수정</a>
                 </div>
                 <button type="button" class="site-meal-modal-close" aria-label="닫기" data-meal-modal-close>&times;</button>
             </header>
