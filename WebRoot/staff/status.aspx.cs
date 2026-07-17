@@ -27,7 +27,7 @@ public partial class staff_status : System.Web.UI.Page
                 hdMode.Value = "1";
             else
                 hdMode.Value = Request.QueryString["mode"].ToString().Trim();
-        }            
+        }
         else
             hdMode.Value = "1";
         #endregion
@@ -39,7 +39,7 @@ public partial class staff_status : System.Web.UI.Page
             LoadRetreats();
 
             try
-            {   
+            {
 
                 if (hdMode.Value.ToString().Equals("1"))
                 {
@@ -405,7 +405,7 @@ public partial class staff_status : System.Web.UI.Page
                     ";
                 }
 
-                    
+
 
                 #endregion
 
@@ -436,8 +436,8 @@ public partial class staff_status : System.Web.UI.Page
 
     protected void GetStatusPay()
     {
-        decimal _income = -1;
-        decimal _expenses = -1;
+        decimal _income = -1;
+        decimal _expenses = -1;
 
         StringBuilder sb1 = new StringBuilder();
         string _html_tab2 = @"
@@ -464,7 +464,7 @@ public partial class staff_status : System.Web.UI.Page
 
         if (ds.Tables[1].Rows.Count > 0)
         {
-            _income = Convert.ToDecimal(ds.Tables[1].Rows[0]["payment_all"].ToString().Trim());
+            _income = Convert.ToDecimal(ds.Tables[1].Rows[0]["payment_all"].ToString().Trim());
         }
 
         gvList.DataSource = ds.Tables[0];
@@ -477,7 +477,7 @@ public partial class staff_status : System.Web.UI.Page
 
         if (ds.Tables[1].Rows.Count > 0)
         {
-            _expenses = Convert.ToDecimal(ds.Tables[1].Rows[0]["payment_all"].ToString().Trim());
+            _expenses = Convert.ToDecimal(ds.Tables[1].Rows[0]["payment_all"].ToString().Trim());
         }
 
         gvList2.DataSource = ds.Tables[0];
@@ -485,7 +485,7 @@ public partial class staff_status : System.Web.UI.Page
 
         if (!_income.Equals(-1) && !_expenses.Equals(-1))
         {
-            decimal _result = _income - _expenses;
+            decimal _result = _income - _expenses;
             lblResult.Text = "총 결산 : " + String.Format("{0:#,0}", _result) + " 원";
 
             if (_result >= 0)

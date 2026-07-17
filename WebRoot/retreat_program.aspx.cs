@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.IO;
 using System.Web;
@@ -36,12 +36,14 @@ public partial class retreat_program : System.Web.UI.Page
 
             byte[] byteFile = (byte[])fileData;
             string contentType = GetContentType(fileName, GetString(row, "file_type"));
+            bool forceDownload = string.Equals(Request.QueryString["download"], "1", StringComparison.Ordinal);
 
             Response.Clear();
             Response.BufferOutput = true;
             Response.ContentType = contentType;
-            Response.AppendHeader("Content-Disposition", BuildInlineContentDisposition(fileName));
+            Response.AppendHeader("Content-Disposition", BuildContentDisposition(fileName, forceDownload));
             Response.AppendHeader("Content-Length", byteFile.Length.ToString());
+            Response.AppendHeader("X-Content-Type-Options", "nosniff");
             Response.Cache.SetCacheability(HttpCacheability.NoCache);
             Response.Cache.SetNoStore();
             Response.BinaryWrite(byteFile);
@@ -85,12 +87,13 @@ public partial class retreat_program : System.Web.UI.Page
         }
     }
 
-    private static string BuildInlineContentDisposition(string fileName)
+    private static string BuildContentDisposition(string fileName, bool forceDownload)
     {
         string extension = Path.GetExtension(fileName);
         string fallbackFileName = "retreat-program" + (string.IsNullOrWhiteSpace(extension) ? ".pdf" : extension);
+        string disposition = forceDownload ? "attachment" : "inline";
 
-        return "inline; filename=\"" + SanitizeHeaderValue(fallbackFileName) + "\"; filename*=UTF-8''" + Uri.EscapeDataString(fileName);
+        return disposition + "; filename=\"" + SanitizeHeaderValue(fallbackFileName) + "\"; filename*=UTF-8''" + Uri.EscapeDataString(fileName);
     }
 
     private static string SanitizeHeaderValue(string value)

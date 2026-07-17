@@ -25,7 +25,7 @@ public partial class _Default : System.Web.UI.Page
             if (ds.Tables[0].Rows.Count > 0)
             {
                 btnProgramView.Visible = !ds.Tables[0].Rows[0]["file_nm"].ToString().Trim().Equals(string.Empty);
-                btnProgramView.HRef = CodeHelper.ToCanonicalUrl("/retreat_program");
+                btnProgramView.HRef = CodeHelper.ToCanonicalUrl("/retreat_program_viewer");
 
                 _retreat_seq = ds.Tables[0].Rows[0]["seq"].ToString();
                 mTitle.InnerHtml = ds.Tables[0].Rows[0]["retreat_name"].ToString();

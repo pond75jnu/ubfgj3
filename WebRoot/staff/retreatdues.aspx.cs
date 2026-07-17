@@ -17,7 +17,7 @@ public partial class staff_retreatdues : System.Web.UI.Page
         _auth = UserInfo.UserRole;
         _login_id = UserInfo.UserID;
         lblPageTitle.Text = CodeHelper.GetPagetitle(_path);
-        
+
 
         if (!Page.IsPostBack)
         {
@@ -67,7 +67,7 @@ public partial class staff_retreatdues : System.Web.UI.Page
                     btnNew.Visible = true;
                 else
                     btnNew.Visible = false;
-                    
+
                 btnModify.Visible = false;
                 btnList.Visible = false;
                 btnSave.Visible = false;
@@ -128,7 +128,7 @@ public partial class staff_retreatdues : System.Web.UI.Page
                 new SqlParameter("@top_count", SqlDbType.Int) { Value = 10 },
                 new SqlParameter("@active_only", SqlDbType.Bit) { Value = false });
 
-            if (ds.Tables[0].Rows.Count > 0) 
+            if (ds.Tables[0].Rows.Count > 0)
             {
                 ddl_retreat.DataSource = ds;
                 ddl_retreat.DataBind();
@@ -177,7 +177,7 @@ public partial class staff_retreatdues : System.Web.UI.Page
             if (ds.Tables[0].Rows.Count > 0)
             {
                 txtRetreatDuesNM.Text = ds.Tables[0].Rows[0]["dues_nm"].ToString().Trim();
-                txtRetreatDues.Text = String.Format("{0:#,0}", Convert.ToDecimal(ds.Tables[0].Rows[0]["dues"]));
+                txtRetreatDues.Text = String.Format("{0:#,0}", Convert.ToDecimal(ds.Tables[0].Rows[0]["dues"]));
                 txtRetreatDuesDesc.Text = ds.Tables[0].Rows[0]["dues_desc"].ToString().Trim();
             }
 
@@ -240,7 +240,7 @@ public partial class staff_retreatdues : System.Web.UI.Page
 
                 CodeHelper.Redirect("삭제하였습니다!", "/staff/retreatdues");
             }
-            
+
         }
     }
 

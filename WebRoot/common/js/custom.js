@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", function () {
         lastActiveElement = link || document.activeElement;
 
         if (frame) {
-            frame.setAttribute("src", (link && link.getAttribute("href")) || "/retreat_program");
+            frame.setAttribute("src", (link && link.getAttribute("href")) || "/retreat_program_viewer");
         }
 
         modal.style.display = "flex";

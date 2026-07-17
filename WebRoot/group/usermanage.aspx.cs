@@ -35,7 +35,7 @@ public partial class group_usermanage : System.Web.UI.Page
         #endregion
 
         lblPageTitle.Text = CodeHelper.GetPagetitle(_path);
-        
+
 
         if (!Page.IsPostBack)
         {
@@ -44,7 +44,7 @@ public partial class group_usermanage : System.Web.UI.Page
             LoardDuesType();
             LoardDuesInfo();
 
-            
+
         }
 
         GetLoadMembers();
@@ -56,7 +56,7 @@ public partial class group_usermanage : System.Web.UI.Page
         {
             DataSet ds = EfStoredProcedure.ExecuteDataSet("ubfgj3.dbo.SP_retreat_active_get");
 
-            if (ds.Tables[0].Rows.Count > 0) 
+            if (ds.Tables[0].Rows.Count > 0)
             {
                 ddl_retreat.DataSource = ds;
                 ddl_retreat.DataBind();
@@ -64,14 +64,14 @@ public partial class group_usermanage : System.Web.UI.Page
                 ddl_retreat.Enabled = false;
                 btnSave.Enabled = true;
             }
-            else 
+            else
             {
                 Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "Alert", "<script>alert('수양회 정보가 없습니다. (관리자 문의)');</script>");
                 btnSave.Enabled = false;
                 return;
             }
 
-            
+
 
         }
         catch (Exception ex)
@@ -89,7 +89,7 @@ public partial class group_usermanage : System.Web.UI.Page
                 new SqlParameter("@RETREAT", ddl_retreat.SelectedValue));
 
 
-            if (ds.Tables[0].Rows.Count > 0) 
+            if (ds.Tables[0].Rows.Count > 0)
             {
                 ddl_group.DataSource = ds;
                 ddl_group.DataBind();
@@ -105,7 +105,7 @@ public partial class group_usermanage : System.Web.UI.Page
                 }
                 else
                     ddl_group.Enabled = false;
-                
+
             }
             else
             {
@@ -113,7 +113,7 @@ public partial class group_usermanage : System.Web.UI.Page
                 btnSave.Enabled = false;
                 return;
             }
-            
+
         }
         catch (Exception ex)
         {
@@ -131,7 +131,7 @@ public partial class group_usermanage : System.Web.UI.Page
                 new SqlParameter("@SORT_DIRECTION", "ASC"));
 
 
-            if (ds.Tables[0].Rows.Count > 0) 
+            if (ds.Tables[0].Rows.Count > 0)
             {
                 hdDuestypesCount.Value = ds.Tables[0].Rows.Count.ToString();
 
@@ -148,7 +148,7 @@ public partial class group_usermanage : System.Web.UI.Page
                 _duestypes_string_length = _duestypes.Length;
                 hdDuestypes.Value = _duestypes.Substring(0, _duestypes_string_length - 1);
 
-                
+
             }
             else
             {
@@ -156,7 +156,7 @@ public partial class group_usermanage : System.Web.UI.Page
                 btnSave.Enabled = false;
                 return;
             }
-            
+
         }
         catch (Exception ex)
         {
@@ -205,14 +205,14 @@ public partial class group_usermanage : System.Web.UI.Page
 
     protected void GetGroupMembers()
     {
-        
+
         try
         {
             id_left_menu.mRetreat = ddl_retreat.SelectedValue;
             id_left_menu.mBelong = ddl_group.SelectedValue;
             //id_left_menu.GetR
 
-            
+
 
             DataSet ds = EfStoredProcedure.ExecuteDataSet(
                 "ubfgj3.dbo.SP_group_members_get_for_usermanage",
@@ -296,7 +296,7 @@ public partial class group_usermanage : System.Web.UI.Page
         {
             Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "Alert", "<script>alert('멤버 로드 중 에러발생 : " + Server.HtmlEncode(ex.Message) + @"');</script>");
         }
-        
+
     }
 
     /// <summary>
@@ -370,7 +370,7 @@ public partial class group_usermanage : System.Web.UI.Page
         try
         {
             if (!hdSaveMembers.Value.Trim().Equals(string.Empty))
-            {                
+            {
 
                 string _save_data = hdSaveMembers.Value.Trim();
                 string[] _save_data_types = _save_data.Split('†');
@@ -396,7 +396,7 @@ public partial class group_usermanage : System.Web.UI.Page
                 string[] _save_attend = _save_data_type_05_real.Split('‡');
 
                 string _save_nm = string.Empty;
-                int _save_dues = 0;
+                int _save_dues = 0;
                 string _save_desc = string.Empty;
                 string _save_seq = string.Empty;
                 string _save_usertype_value = string.Empty;
@@ -409,15 +409,15 @@ public partial class group_usermanage : System.Web.UI.Page
                 DataSet ds_Sav = null;
 
                 StringBuilder keepSeqList = new StringBuilder();
-                
-                int _chk = 0;          
+
+                int _chk = 0;
 
                 for (int i = 0; i < _save_row.Length; i++)
                 {
                     _save_col = _save_row[i].Split('‡');
 
                     _save_nm = _save_col[0].Trim().Replace("\"", "").Replace("'", "");
-                    _save_dues = CodeHelper.ParseWholeWonInt(_save_col[1], "납부금액");
+                    _save_dues = CodeHelper.ParseWholeWonInt(_save_col[1], "납부금액");
                     _save_desc = _save_col[2].Trim().Replace("\"", "").Replace("'", "");
                     _save_seq = _save_col[3].Trim();
                     _save_usertype_value = _save_usertype[i].Trim();
@@ -425,7 +425,7 @@ public partial class group_usermanage : System.Web.UI.Page
                     _save_howtoregist_value = _save_howtoregist[i].Trim();
                     _save_attend_value = _save_attend[i].Trim();
 
-                    _manage_confirm = (_auth.ToLower().Equals("admin") || _auth.ToLower().Equals("manager")) && _save_dues > 0 ? "Y" : "N";
+                    _manage_confirm = (_auth.ToLower().Equals("admin") || _auth.ToLower().Equals("manager")) && _save_dues > 0 ? "Y" : "N";
 
                     //이름이 비어있지 않거나, 저정된 키값(seq)가 없을 경우에는 새 행으로 처리함
                     if (!_save_nm.Equals(string.Empty) && _save_seq.Trim().Equals(string.Empty))
@@ -503,7 +503,7 @@ public partial class group_usermanage : System.Web.UI.Page
                 }
 
             }
-            else 
+            else
             {
                 // 관리자나 실무자가 아닌 경우에는 실무자가 확인한것 제외하고 전체를 지운다.
                 // 관리자나 실무자인 경우는 실무자가 확인했을지라도 지울 수 있다.
@@ -528,7 +528,7 @@ public partial class group_usermanage : System.Web.UI.Page
 
     protected void ddl_group_SelectedIndexChanged(object sender, EventArgs e)
     {
-        
+
         //GetLoadMembers();
 
         //left메뉴 요회별등록현황을 가져오기 위해 아래와 같이 처리
@@ -564,6 +564,6 @@ public partial class group_usermanage : System.Web.UI.Page
         }
     }
 
-    
+
 
 }
