@@ -3,8 +3,8 @@
 <%@ Register TagPrefix="ubfgj3_uc" TagName="left_menu" Src="~/userControl/left_menu.ascx" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <link rel="stylesheet" href="/common/css/meal-precheck.css?v=meal-precheck-11" />
-    <script defer src="/common/js/meal-precheck.js?v=meal-precheck-11"></script>
+    <link rel="stylesheet" href="/common/css/meal-precheck.css?v=meal-precheck-13" />
+    <script defer src="/common/js/meal-precheck.js?v=meal-precheck-13"></script>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
@@ -67,7 +67,7 @@
         </div>
     </div>
 
-    <asp:Panel ID="pnlDetailModal" runat="server" CssClass="site-meal-modal" Visible="false" role="dialog" aria-modal="true" aria-labelledby="mealDetailTitle" data-meal-modal>
+    <asp:Panel ID="pnlDetailModal" runat="server" CssClass="site-meal-modal site-meal-detail-modal" Visible="false" role="dialog" aria-modal="true" aria-labelledby="mealDetailTitle" data-meal-modal>
         <button type="button" class="site-meal-modal-backdrop" aria-label="상세 창 닫기" data-meal-modal-close></button>
         <section class="site-meal-modal-dialog" data-meal-modal-dialog>
             <header class="site-meal-modal-header">

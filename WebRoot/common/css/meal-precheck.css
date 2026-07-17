@@ -896,6 +896,130 @@ body.site-meal-modal-open {
         border-radius: 14px 14px 0 0;
     }
 
+    .site-meal-detail-modal {
+        align-items: start;
+        padding: max(10px, env(safe-area-inset-top)) 8px 8px;
+    }
+
+    .site-meal-detail-modal .site-meal-modal-dialog {
+        max-height: calc(100vh - 20px);
+        max-height: calc(100dvh - 20px - env(safe-area-inset-top));
+        border-radius: 14px;
+    }
+
+    .site-meal-detail-scroll {
+        overflow: visible;
+    }
+
+    .site-meal-detail-table,
+    .site-meal-detail-table tbody,
+    .site-meal-detail-table tr,
+    .site-meal-detail-table th,
+    .site-meal-detail-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .site-meal-detail-table {
+        border: 0;
+    }
+
+    .site-meal-detail-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        clip-path: inset(50%);
+    }
+
+    .site-meal-detail-table tbody tr {
+        margin-bottom: 12px;
+        overflow: hidden;
+        border: 1px solid #dbe3ee;
+        border-radius: 11px;
+        background: #fff;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.05);
+    }
+
+    .site-meal-detail-table tbody tr:last-child {
+        margin-bottom: 0;
+    }
+
+    .site-meal-detail-table tbody th {
+        border: 0;
+        border-bottom: 1px solid #e6ebf2;
+        background: #f8fafc;
+        padding: 11px 12px;
+        text-align: left;
+    }
+
+    .site-meal-detail-table tbody th strong,
+    .site-meal-detail-table tbody th small {
+        display: block;
+    }
+
+    .site-meal-detail-table tbody th strong {
+        color: #172033;
+        font-size: 14px;
+    }
+
+    .site-meal-detail-table tbody th small {
+        margin-top: 2px;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .site-meal-detail-table tbody td {
+        display: grid;
+        grid-template-columns: 72px minmax(0, 1fr);
+        align-items: start;
+        border: 0;
+        border-bottom: 1px solid #edf1f5;
+        padding: 8px 10px;
+        text-align: left;
+    }
+
+    .site-meal-detail-table tbody td:last-child {
+        border-bottom: 0;
+    }
+
+    .site-meal-detail-table tbody td::before {
+        color: #475569;
+        content: attr(data-date-label);
+        padding-top: 6px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .site-meal-detail-cell {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 4px;
+        justify-content: stretch;
+    }
+
+    .site-meal-detail-cell span {
+        display: flex;
+        min-height: 30px;
+        align-items: center;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        padding: 5px 8px;
+        font-size: 12px;
+    }
+
+    .site-meal-detail-cell .is-selected {
+        border-color: #ccebdc;
+    }
+
+    .site-meal-detail-cell .is-unselected {
+        border-color: #e8edf3;
+        background: #f8fafc;
+    }
+
     .site-meal-modal-header,
     .site-meal-modal-body,
     .site-meal-modal-footer {

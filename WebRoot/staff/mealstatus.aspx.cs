@@ -575,7 +575,9 @@ public partial class staff_mealstatus : Page
             html.Append("<tr><th scope='row'><strong>전체 대상</strong><small>수량 직접입력</small></th>");
             foreach (string date in dates)
             {
-                html.Append("<td><div class='site-meal-detail-cell'>");
+                html.Append("<td data-date-label='")
+                    .Append(Server.HtmlEncode(MealPrecheckHelper.FormatDate(date)))
+                    .Append("'><div class='site-meal-detail-cell'>");
                 foreach (DataRow meal in providedByDate[date])
                 {
                     string type = Convert.ToString(meal["meal_type"]);
@@ -601,7 +603,9 @@ public partial class staff_mealstatus : Page
 
             foreach (string date in dates)
             {
-                html.Append("<td><div class='site-meal-detail-cell'>");
+                html.Append("<td data-date-label='")
+                    .Append(Server.HtmlEncode(MealPrecheckHelper.FormatDate(date)))
+                    .Append("'><div class='site-meal-detail-cell'>");
                 foreach (DataRow meal in providedByDate[date])
                 {
                     string type = Convert.ToString(meal["meal_type"]);
