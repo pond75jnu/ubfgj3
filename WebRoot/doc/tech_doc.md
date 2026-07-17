@@ -612,6 +612,58 @@ SP 소스는 `DB/StoredProcedure` 아래에 관리한다. 개별 SP 파일은 `C
 5. `DB.sqlproj`에 새 파일을 `<None Include="StoredProcedure\SP명.sql" />`로 등록한다.
 6. 모든 SQL 파일은 UTF-8 with BOM으로 저장한다.
 
+## 식사수량 사전조사
+
+### 사용자 흐름과 URL
+
+- Home의 `수양회 식사여부 사전조사` 버튼은 비로그인 공개 화면 `/meal-precheck`로 이동한다.
+- 공개 화면은 로그인하지 않은 경우 별도 공용 암호 인증 후 활성 수양회와 요회를 선택하고 구성원별 식사를 저장한다.
+- 로그인 세션의 역할이 `user`(요회목자), `manager`, `admin`이면 공용 암호 없이 바로 접근한다. 요회목자는 `UserInfo.LoginUserBelongCode`의 소속 요회로 드롭다운과 서버 조회·저장 대상이 모두 고정되고, 실무자와 관리자는 전체 요회를 선택할 수 있다.
+- 조사 명단에 사람이 없으면 구성원 표 아래의 `신규인원 추가` 버튼을 누르고 모달에서 성명, 목자/목동/양, 학사/학생을 입력한다. 활성 수양회의 `학사` 또는 `학생` 회비구분을 서버에서 찾아 기존 `SP_group_member_save`로 `group_members`에 추가하므로 `/group/usermanage`에도 즉시 나타난다. 저장 후 선택한 요회로 리다이렉트하고 신규 구성원 행을 강조해 화면 중앙으로 스크롤한다.
+- `manager`, `admin`은 `/staff/mealstatus`에서 요회별 집계·상세와 날짜별 식사 제공 사전설정을 관리한다.
+- 현황 탭의 엑셀 다운로드는 `/staff/mealstatus_excel_export`에서 활성 수양회의 전체 요회를 조회한다. 구성원 한 명을 한 행으로 두고 제공되는 날짜·식사만 열로 출력하며 선택은 숫자 `1`, 미선택은 `0`으로 구분한다. 요회 제출 상태를 포함하고 내용에 맞춰 열 너비를 자동 조정한다.
+- DB 메뉴 경로는 기존 메뉴 조회 규칙에 맞춰 `/staff/mealstatus.aspx`, 브라우저 URL은 extensionless로 유지한다.
+
+### 웹 파일과 보안
+
+- 화면: `meal-precheck.aspx`, `staff/mealstatus.aspx`, `staff/mealstatus_excel_export.aspx`
+- 공통 코드: `App_Code/MealPrecheckSecurity.cs`, `App_Code/MealPrecheckHelper.cs`
+- 전용 자원: `common/css/meal-precheck.css`, `common/js/meal-precheck.js`
+- 공개 암호는 `appsettings.json`의 `MealPrecheck`에 PBKDF2 hash/salt로 저장하며 평문을 저장하지 않는다.
+- 로그인 우회 접근도 별도 CSRF 토큰을 발급·검증한다. 로그인 역할과 요회목자 소속은 매 요청마다 서버의 Membership/Role 및 회원 소속 정보로 다시 판별한다.
+- 브라우저 토큰과 IP는 HMAC-SHA256 해시만 DB에 보관한다. 두 scope 중 하나라도 5회 연속 실패하면 10분간 잠긴다.
+- 인증은 브라우저 세션 쿠키를 사용하고 인증 시점부터 최대 2시간만 허용한다. 공개 페이지는 `no-store`, `noindex`, ViewState 사용자 키, 별도 CSRF 토큰을 적용한다.
+- 공개 저장은 현재 활성 수양회, 활성 요회, 현재 명단, 제공 중인 식사만 서버에서 다시 조회해 허용한다. 클라이언트 값만 신뢰하지 않는다.
+- 신규인원 추가도 인증 세션과 CSRF를 확인하고, 요회목자는 서버에서 로그인 소속 요회로 강제한다. 신규 인원은 납부액 0원, 미확인, 미참석 기본값으로 추가되며 성명과 선택 코드는 서버에서 허용 목록 검증한다.
+- 설정과 요회 제출은 revision 기반 낙관적 동시성을 사용한다. 구성원 또는 식사 설정이 바뀐 제출은 `재확인 필요`로 표시한다.
+
+`appsettings.json.local`의 `MealPrecheck` 값은 구조 예시다. 운영에서는 hash, salt, HMAC key를 각각 안전한 난수 기반 값으로 교체해야 한다.
+
+### DB 객체
+
+| 객체 | 역할 |
+| --- | --- |
+| `meal_service_config` | 수양회 날짜·식사별 제공 여부와 설정 revision |
+| `meal_survey_submission` | 수양회·요회별 제출 header, 명단 hash, revision |
+| `meal_survey_selection` | 구성원별 선택한 식사 detail |
+| `meal_access_guard` | 브라우저/IP scope별 실패 횟수와 잠금 시각 |
+
+관련 SP는 `DB/StoredProcedure/SP_meal_*.sql` 10개이며 `DB.sqlproj`와 `All_SP_LIST.sql`에 포함한다. 구성원·요회 삭제와 수양회 삭제 제한은 기존 삭제 SP 4개에서 식사 조사 데이터까지 함께 처리한다.
+
+실제 DB 반영은 `WebRoot/appsettings.json` 연결정보를 읽어 `sqlcmd`로 수행한다. 현재 로컬 `sqlcmd 15.0`에서는 `-N`, `-C`를 모두 생략해 암호화를 선택적으로 두고 서버 인증서를 강제로 신뢰하지 않는다. `-I -b -V 11 -f 65001`을 사용하고 암호는 `SQLCMDPASSWORD` 환경변수로만 전달한다.
+
+운영 정책상 전체 DB 백업은 수행하지 않는다. 기존 업무 테이블의 데이터를 변경해야 할 때만 사용자와 대상·백업명·보존기간을 확인한 뒤 같은 DB에 `SELECT * INTO [테이블_백업] FROM [테이블]` 형태의 테이블 단위 스냅샷을 만든다. 신규 테이블 생성처럼 기존 데이터가 바뀌지 않는 작업에는 불필요한 백업 테이블을 만들지 않는다.
+
+### 식사 조사 검증
+
+- ASP.NET Web Site 전체는 `.NET Framework 4.8 aspnet_compiler.exe -v / -p .\WebRoot`로 사전 컴파일한다.
+- DB migration 후 `DB/Migration/20260717_meal_precheck_verify.sql`을 재실행한다.
+- 공개 화면은 첫 익명 GET에서 ASP.NET 세션 쿠키가 발급되는지, 암호 POST 후 요회·구성원 표와 CSRF 값이 출력되는지 확인한다.
+- `user`, `manager`, `admin` 로그인 세션에서는 암호 화면이 생략되는지 확인한다. `user`는 소속 요회가 선택·비활성화되고 다른 요회 값을 변조해도 서버가 소속 요회만 사용하는지 확인한다.
+- 신규인원 모달의 필수값·허용값 검증, 학사/학생 회비구분 매핑, 추가 직후 식사 명단과 `/group/usermanage` 양쪽 노출, 명단 변경에 따른 `재확인 필요` 상태를 확인한다.
+- 식사여부 저장 성공 후 `저장되었습니다.` alert가 한 번 표시되는지, 신규인원 추가 후 같은 요회와 신규 행의 스크롤 위치가 유지되는지 확인한다.
+- 모바일에서는 공개 표가 구성원별 카드로 전환되고 44px 이상의 체크 영역과 하단 저장 버튼이 유지되는지 확인한다.
+
 ## 페이지별 유지보수 맵
 
 | 기능 | 파일 | 확인할 DB/의존성 |
@@ -634,6 +686,7 @@ SP 소스는 `DB/StoredProcedure` 아래에 관리한다. 개별 SP 파일은 `C
 | 지출 관리 | `staff/expenses.aspx.cs` | `payment_master`, `cash_item_master`, `SP_staff_payment_*`, `SP_income_get_list`, `_attatch` |
 | 실무확인 | `staff/registatus.aspx.cs` | `group_members`, `groups`, `retreatdues_master`, `SP_registatus_*` |
 | 종합현황 | `staff/status.aspx.cs` | `group_members`, `SP_status_*`, `SP_income_get_list_status` |
+| 식사수량 사전조사 | `meal-precheck.aspx.cs`, `staff/mealstatus.aspx.cs`, `staff/mealstatus_excel_export.aspx.cs` | `meal_*`, `SP_meal_*`, `group_members`, `groups`, `retreat_master`, `XlsxExportHelper` |
 | 엑셀/인쇄 | `staff/*export.aspx.cs`, `staff/*print.aspx.cs` | OpenXML `.xlsx` export, no-frame master |
 
 ## 새 기능 추가 절차
@@ -660,8 +713,8 @@ SP 소스는 `DB/StoredProcedure` 아래에 관리한다. 개별 SP 파일은 `C
 - OpenXML `.xlsx` 생성에 `WindowsBase` assembly 참조가 필요하므로 운영 서버에 .NET Framework 4.x 런타임/Developer Pack 구성이 맞는지 확인한다.
 - 운영 도메인 `ubfgj3.kr`, `www.ubfgj3.kr`는 HTTP 접근 시 HTTPS로 리다이렉트된다.
 - `_attatch` 저장 루트와 `temp` 폴더에 앱 풀 계정 쓰기/삭제 권한이 필요하다.
-- DB 변경 전 `retreat_master`, `groups`, `retreatdues_master`, `group_members`, `payment_master`, `member_master`, Membership 테이블을 백업한다.
-- 저장 프로시저 정의도 DB에서 별도 백업한다.
+- 운영 정책상 전체 DB 백업은 수행하지 않는다. 기존 테이블 데이터 변경이 필요한 경우에만 승인된 이름으로 `SELECT * INTO [테이블_백업] FROM [테이블]` 테이블 단위 백업을 사용한다.
+- 변경하는 저장 프로시저 정의는 반영 전 텍스트로 보관하고 저장소의 개별 SP 파일과 비교한다.
 - 수양회 전환 기능 배포 전 `SP_retreat_set_only_active`가 운영 DB에 반영되어 있는지 확인한다.
 - 엑셀 출력은 OpenXML 기반 `.xlsx` 파일로 생성된다.
 - 엑셀 export 변경은 DB 변경 없이 웹 코드와 `Web.config` 반영만 필요하다.
@@ -669,6 +722,7 @@ SP 소스는 `DB/StoredProcedure` 아래에 관리한다. 개별 SP 파일은 `C
 ## 유지보수 주의점
 
 - 현재 화면 코드의 DB 접근은 Stored Procedure와 `SqlParameter` 기반 호출로 정리되어 있다. 신규/수정 코드는 인라인 SQL 문자열을 추가하지 말고 `EfStoredProcedure`와 파라미터 바인딩을 사용한다.
+- `new SqlParameter("@NAME", 0)`은 `0`이 값이 아니라 `SqlDbType` 생성자 인수로 해석될 수 있다. 숫자 0은 `new SqlParameter("@NAME", SqlDbType.Int) { Value = 0 }`처럼 타입과 값을 명시한다.
 - 신규 엑셀 다운로드는 GridView HTML을 `.xls`로 렌더링하지 말고 `XlsxExportHelper.WriteDataTableToResponse()`를 사용한다.
 - 현재 사용 수양회는 시스템 전체 기준이다. `staff/retreat.aspx` 또는 상단 `수양회 전환` 모달에서 수양회를 `사용(Y)`으로 바꾸면 다른 수양회는 자동으로 `N` 처리된다.
 - 과거 수양회가 활성화된 상태에서는 일반 화면 상단에 `과거 수양회(수양회명) 내용으로 보는 중입니다.` 안내가 표시된다. 단, `시스템`, `My정보수정` 하위 메뉴와 no-frame 인쇄 화면에는 표시하지 않는다.
@@ -720,3 +774,6 @@ SP 소스는 `DB/StoredProcedure` 아래에 관리한다. 개별 SP 파일은 `C
 | `/staff/expenses` | 지출 관리 |
 | `/staff/items` | 수입/지출 코드 관리 |
 | `/staff/status` | 종합 현황 |
+| `/staff/mealstatus` | 식사수량 현황·사전설정 (`manager`, `admin`) |
+| `/staff/mealstatus_excel_export` | 활성 수양회 전체 요회 식사 선택 상세 엑셀 (`manager`, `admin`) |
+| `/meal-precheck` | 비로그인 식사여부 사전조사 |

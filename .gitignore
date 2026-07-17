@@ -53,3 +53,5 @@ WebRoot/_attatch/*
 !WebRoot/_attatch/.gitkeep
 
 appsettings.json
+precheck_prd.md
+precheck_plan.md

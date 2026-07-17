@@ -51,6 +51,21 @@ public static class AppConfiguration
         }
     }
 
+    public static MealPrecheckSetting MealPrecheck
+    {
+        get
+        {
+            MealPrecheckSetting setting = Settings.MealPrecheck;
+            if (setting == null)
+            {
+                throw new ConfigurationErrorsException("appsettings.json에서 식사 사전조사 설정을 찾을 수 없습니다.");
+            }
+
+            setting.Validate();
+            return setting;
+        }
+    }
+
     public static void ApplyToConfigurationManager()
     {
         if (_configurationManagerApplied)
@@ -167,6 +182,7 @@ public class AppSettingsData
 {
     public Dictionary<string, ConnectionStringSetting> ConnectionStrings { get; set; }
     public SmtpSetting Smtp { get; set; }
+    public MealPrecheckSetting MealPrecheck { get; set; }
 }
 
 public class ConnectionStringSetting
@@ -184,4 +200,51 @@ public class SmtpSetting
     public string Password { get; set; }
     public bool EnableSsl { get; set; }
     public bool DefaultCredentials { get; set; }
+}
+
+public class MealPrecheckSetting
+{
+    public string PasswordHash { get; set; }
+    public string PasswordSalt { get; set; }
+    public int PasswordIterations { get; set; }
+    public string HmacKey { get; set; }
+    public int MaxAttempts { get; set; }
+    public int AttemptWindowMinutes { get; set; }
+    public int LockoutMinutes { get; set; }
+    public int SessionHours { get; set; }
+    public int MaxRetreatDays { get; set; }
+
+    public void Validate()
+    {
+        if (String.IsNullOrWhiteSpace(PasswordHash)
+            || String.IsNullOrWhiteSpace(PasswordSalt)
+            || String.IsNullOrWhiteSpace(HmacKey))
+        {
+            throw new ConfigurationErrorsException("식사 사전조사 비밀 설정이 누락되었습니다.");
+        }
+
+        if (PasswordIterations < 10000
+            || MaxAttempts < 1
+            || AttemptWindowMinutes < 1
+            || LockoutMinutes < 1
+            || SessionHours < 1
+            || MaxRetreatDays < 1)
+        {
+            throw new ConfigurationErrorsException("식사 사전조사 제한 설정이 올바르지 않습니다.");
+        }
+
+        try
+        {
+            if (Convert.FromBase64String(PasswordHash).Length < 20
+                || Convert.FromBase64String(PasswordSalt).Length < 16
+                || Convert.FromBase64String(HmacKey).Length < 32)
+            {
+                throw new ConfigurationErrorsException("식사 사전조사 비밀 설정 길이가 올바르지 않습니다.");
+            }
+        }
+        catch (FormatException ex)
+        {
+            throw new ConfigurationErrorsException("식사 사전조사 비밀 설정 형식이 올바르지 않습니다.", ex);
+        }
+    }
 }

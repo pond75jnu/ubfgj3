@@ -10,7 +10,10 @@
                 <p class="site-home-kicker">UBF 광주3부</p>
                 <h2 id="mTitle" runat="server" class="site-home-title"></h2>
                 <p id="mDesc" runat="server" class="site-home-desc"></p>
-                <a id="btnProgramView" runat="server" class="site-home-button" href="/retreat_program" target="_blank" rel="noopener" data-retreat-program-open>프로그램 세부보기</a>
+                <div class="site-home-actions">
+                    <a id="btnProgramView" runat="server" class="site-home-button" href="/retreat_program" target="_blank" rel="noopener" data-retreat-program-open>프로그램 세부보기</a>
+                    <a class="site-home-button site-home-button-secondary" href="/meal-precheck">수양회 식사여부 사전조사</a>
+                </div>
             </div>
             <div class="site-home-hero-label">UBF 광주 3부 수양회 관리 프로그램</div>
         </div>

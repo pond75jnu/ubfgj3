@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -13,12 +13,17 @@ public static class XlsxExportHelper
     private const string RelationshipsNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
     public static void WriteDataTableToResponse(HttpResponse response, DataTable table, string fileName, string sheetName)
     {
+        WriteDataTableToResponse(response, table, fileName, sheetName, false);
+    }
+
+    public static void WriteDataTableToResponse(HttpResponse response, DataTable table, string fileName, string sheetName, bool autoFitColumns)
+    {
         if (!fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
             fileName += ".xlsx";
 
         using (MemoryStream workbookStream = new MemoryStream())
         {
-            WriteWorkbook(workbookStream, table, sheetName);
+            WriteWorkbook(workbookStream, table, sheetName, autoFitColumns);
 
             response.Clear();
             response.Buffer = true;
@@ -33,7 +38,7 @@ public static class XlsxExportHelper
         }
     }
 
-    private static void WriteWorkbook(Stream output, DataTable table, string sheetName)
+    private static void WriteWorkbook(Stream output, DataTable table, string sheetName, bool autoFitColumns)
     {
         using (Package package = Package.Open(output, FileMode.Create, FileAccess.ReadWrite))
         {
@@ -71,7 +76,7 @@ public static class XlsxExportHelper
                 "rId2");
 
             WriteWorkbookXml(workbookPart, sheetName);
-            WriteWorksheetXml(worksheetPart, table);
+            WriteWorksheetXml(worksheetPart, table, autoFitColumns);
             WriteStylesXml(stylesPart);
         }
     }
@@ -95,7 +100,7 @@ public static class XlsxExportHelper
         }
     }
 
-    private static void WriteWorksheetXml(PackagePart worksheetPart, DataTable table)
+    private static void WriteWorksheetXml(PackagePart worksheetPart, DataTable table, bool autoFitColumns)
     {
         int rowCount = Math.Max(1, table.Rows.Count + 1);
         int columnCount = Math.Max(1, table.Columns.Count);
@@ -107,6 +112,8 @@ public static class XlsxExportHelper
             writer.WriteStartElement("dimension", SpreadsheetNs);
             writer.WriteAttributeString("ref", "A1:" + GetCellReference(columnCount, rowCount));
             writer.WriteEndElement();
+            if (autoFitColumns)
+                WriteColumnsXml(writer, table);
             writer.WriteStartElement("sheetData", SpreadsheetNs);
 
             writer.WriteStartElement("row", SpreadsheetNs);
@@ -143,6 +150,62 @@ public static class XlsxExportHelper
             writer.WriteEndElement();
             writer.WriteEndDocument();
         }
+    }
+
+    private static void WriteColumnsXml(XmlWriter writer, DataTable table)
+    {
+        writer.WriteStartElement("cols", SpreadsheetNs);
+        for (int columnIndex = 0; columnIndex < table.Columns.Count; columnIndex++)
+        {
+            double width = GetAutoFitWidth(table, columnIndex);
+            writer.WriteStartElement("col", SpreadsheetNs);
+            writer.WriteAttributeString("min", (columnIndex + 1).ToString(CultureInfo.InvariantCulture));
+            writer.WriteAttributeString("max", (columnIndex + 1).ToString(CultureInfo.InvariantCulture));
+            writer.WriteAttributeString("width", width.ToString("0.##", CultureInfo.InvariantCulture));
+            writer.WriteAttributeString("customWidth", "1");
+            writer.WriteEndElement();
+        }
+        writer.WriteEndElement();
+    }
+
+    private static double GetAutoFitWidth(DataTable table, int columnIndex)
+    {
+        int maxLength = GetDisplayLength(table.Columns[columnIndex].ColumnName);
+        foreach (DataRow row in table.Rows)
+        {
+            object value = row[columnIndex];
+            if (value == null || value == DBNull.Value)
+                continue;
+
+            int length = GetDisplayLength(Convert.ToString(value, CultureInfo.CurrentCulture));
+            if (length > maxLength)
+                maxLength = length;
+        }
+
+        return Math.Min(255D, Math.Max(8D, maxLength + 2D));
+    }
+
+    private static int GetDisplayLength(string value)
+    {
+        if (String.IsNullOrEmpty(value))
+            return 0;
+
+        int currentLineLength = 0;
+        int maxLineLength = 0;
+        foreach (char character in value)
+        {
+            if (character == '\r')
+                continue;
+            if (character == '\n')
+            {
+                maxLineLength = Math.Max(maxLineLength, currentLineLength);
+                currentLineLength = 0;
+                continue;
+            }
+
+            currentLineLength += character <= 0x7f ? 1 : 2;
+        }
+        return Math.Max(maxLineLength, currentLineLength);
     }
 
     private static void WriteStylesXml(PackagePart stylesPart)

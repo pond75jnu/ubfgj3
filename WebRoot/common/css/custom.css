@@ -1,4 +1,4 @@
-html {
+﻿html {
     background: #f5f5f7;
     color: #1d1d1f;
     font-family: "Pretendard GOV", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", "Malgun Gothic", sans-serif;
@@ -3050,6 +3050,29 @@ textarea.ui-input {
     color: rgba(255, 255, 255, 0.88);
     font-size: 14px;
     line-height: 1.55;
+}
+
+.site-home-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.site-home-actions .site-home-button {
+    margin-top: 0;
+}
+
+.site-home-button.site-home-button-secondary {
+    border-color: rgba(255, 255, 255, 0.72);
+    background: rgba(15, 23, 42, 0.34);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+}
+
+.site-home-button.site-home-button-secondary:hover {
+    border-color: #fff;
+    background: rgba(15, 23, 42, 0.55);
 }
 
 .site-shell input.site-home-button,

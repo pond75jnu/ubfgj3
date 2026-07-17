@@ -4,12 +4,19 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT seq
+    SELECT CONVERT(BIGINT, seq) AS seq
       FROM ubfgj3.dbo.group_members
      WHERE retreat = @SEQ
     UNION ALL
-    SELECT seq
+    SELECT CONVERT(BIGINT, seq)
       FROM ubfgj3.dbo.retreatdues_master
+     WHERE retreat = @SEQ
+    UNION ALL
+    SELECT CONVERT(BIGINT, seq)
+      FROM ubfgj3.dbo.meal_service_config
+     WHERE retreat = @SEQ
+    UNION ALL
+    SELECT seq
+      FROM ubfgj3.dbo.meal_survey_submission
      WHERE retreat = @SEQ;
 END
-

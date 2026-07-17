@@ -57,6 +57,11 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="StoredProcedure" />
+    <Folder Include="Migration" />
+    <None Include="Build-AllStoredProcedures.ps1" />
+    <None Include="Migration\20260717_meal_precheck_rollback.sql" />
+    <None Include="Migration\20260717_meal_precheck_schema.sql" />
+    <None Include="Migration\20260717_meal_precheck_verify.sql" />
     <None Include="StoredProcedure\All_SP_LIST.sql" />
     <None Include="StoredProcedure\SP_group_all_list_sel.sql" />
     <None Include="StoredProcedure\SP_group_get_previous_by_name.sql" />
@@ -72,6 +77,16 @@
     <None Include="StoredProcedure\SP_group_seq_match_sel.sql" />
     <None Include="StoredProcedure\SP_groups_get_active_by_retreat.sql" />
     <None Include="StoredProcedure\SP_income_summary_sel.sql" />
+    <None Include="StoredProcedure\SP_meal_access_failure_record.sql" />
+    <None Include="StoredProcedure\SP_meal_access_guard_get.sql" />
+    <None Include="StoredProcedure\SP_meal_access_success_try.sql" />
+    <None Include="StoredProcedure\SP_meal_group_detail_get.sql" />
+    <None Include="StoredProcedure\SP_meal_service_effective_get.sql" />
+    <None Include="StoredProcedure\SP_meal_service_save.sql" />
+    <None Include="StoredProcedure\SP_meal_summary_get.sql" />
+    <None Include="StoredProcedure\SP_meal_survey_groups_get.sql" />
+    <None Include="StoredProcedure\SP_meal_survey_members_get.sql" />
+    <None Include="StoredProcedure\SP_meal_survey_save.sql" />
     <None Include="StoredProcedure\SP_manage_group_del.sql" />
     <None Include="StoredProcedure\SP_manage_group_detail_sel.sql" />
     <None Include="StoredProcedure\SP_manage_group_duplicate_sel.sql" />

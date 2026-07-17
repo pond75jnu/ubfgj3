@@ -1,0 +1,944 @@
+﻿.site-meal-admin-main,
+.site-meal-public {
+    min-width: 0;
+}
+
+.site-meal-admin-main {
+    padding-bottom: 40px;
+}
+
+.site-meal-control-card,
+.site-meal-access-card,
+.site-meal-survey-filter {
+    border: 1px solid #d8dee8;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+}
+
+.site-meal-control-card {
+    margin-bottom: 20px;
+    padding: 16px 18px 0;
+}
+
+.site-meal-filterbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.site-meal-field-label,
+.site-meal-survey-filter label,
+.site-meal-password-row label {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.site-meal-filterbar .ui-select {
+    width: min(100%, 420px);
+}
+
+.site-meal-tabs {
+    display: flex;
+    gap: 4px;
+    border-top: 1px solid #e8edf4;
+}
+
+.site-meal-tabs a {
+    position: relative;
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    padding: 0 15px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.site-meal-tabs a.is-active,
+.site-meal-tabs a[aria-current="page"] {
+    color: #0057ff;
+}
+
+.site-meal-tabs a.is-active::after,
+.site-meal-tabs a[aria-current="page"]::after {
+    position: absolute;
+    right: 10px;
+    bottom: -1px;
+    left: 10px;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+    background: #0057ff;
+    content: "";
+}
+
+.site-meal-section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 22px 0 14px;
+}
+
+.site-meal-section-heading h2,
+.site-meal-survey-meta h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 20px;
+    font-weight: 750;
+}
+
+.site-meal-section-heading p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.site-meal-excel-button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.site-meal-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.site-meal-summary-card {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #dbe3ee;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.site-meal-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 15px 16px 12px;
+}
+
+.site-meal-card-header h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 17px;
+}
+
+.site-meal-card-header p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.site-meal-group-link {
+    border: 0;
+    background: transparent;
+    color: #0057ff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 750;
+    padding: 3px 0;
+    text-align: left;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.site-meal-status-badge {
+    display: inline-flex;
+    flex: 0 0 auto;
+    min-height: 26px;
+    align-items: center;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.site-meal-status-badge.is-complete,
+.site-meal-status-badge.is-summary {
+    background: #e7f8ef;
+    color: #087443;
+}
+
+.site-meal-status-badge.is-recheck {
+    background: #fff4d7;
+    color: #8a5700;
+}
+
+.site-meal-status-badge.is-empty {
+    background: #eef2f7;
+    color: #64748b;
+}
+
+.site-meal-table-scroll,
+.site-meal-config-scroll,
+.site-meal-detail-scroll,
+.site-meal-survey-table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.site-meal-count-table,
+.site-meal-config-table,
+.site-meal-detail-table,
+.site-meal-survey-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: #334155;
+    font-size: 13px;
+}
+
+.site-meal-count-table th,
+.site-meal-count-table td,
+.site-meal-config-table th,
+.site-meal-config-table td,
+.site-meal-detail-table th,
+.site-meal-detail-table td,
+.site-meal-survey-table th,
+.site-meal-survey-table td {
+    border-right: 1px solid #e5eaf1;
+    border-bottom: 1px solid #e5eaf1;
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.site-meal-count-table th:first-child,
+.site-meal-count-table td:first-child,
+.site-meal-config-table th:first-child,
+.site-meal-config-table td:first-child,
+.site-meal-detail-table th:first-child,
+.site-meal-detail-table td:first-child,
+.site-meal-survey-table th:first-child,
+.site-meal-survey-table td:first-child {
+    border-left: 1px solid #e5eaf1;
+}
+
+.site-meal-count-table thead th,
+.site-meal-config-table thead th,
+.site-meal-detail-table thead th,
+.site-meal-survey-table thead th {
+    border-top: 1px solid #dbe3ee;
+    background: #f7f9fc;
+    color: #334155;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.site-meal-count-table thead th:first-child,
+.site-meal-config-table thead th:first-child,
+.site-meal-detail-table thead th:first-child,
+.site-meal-survey-table thead th:first-child {
+    border-top-left-radius: 7px;
+}
+
+.site-meal-count-table thead th:last-child,
+.site-meal-config-table thead th:last-child,
+.site-meal-detail-table thead th:last-child,
+.site-meal-survey-table thead th:last-child {
+    border-top-right-radius: 7px;
+}
+
+.site-meal-total-cell {
+    background: #f8fbff;
+    color: #0057ff;
+    font-weight: 750;
+}
+
+.site-meal-count-value {
+    font-size: 1em;
+}
+
+.site-meal-count-unit {
+    margin-left: 2px;
+    font-size: 0.5em;
+    font-weight: 650;
+    vertical-align: baseline;
+}
+
+.site-meal-not-provided {
+    color: #b1bbc9;
+}
+
+.site-meal-card-footer {
+    border-top: 1px solid #edf0f5;
+    color: #64748b;
+    font-size: 11px;
+    padding: 9px 16px;
+}
+
+.site-meal-config-table {
+    min-width: 620px;
+}
+
+.site-meal-sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    min-width: 76px;
+    background: #fff !important;
+    box-shadow: 1px 0 0 #dbe3ee;
+}
+
+.site-meal-config-table thead .site-meal-sticky-col {
+    z-index: 2;
+    background: #f7f9fc !important;
+}
+
+.site-meal-check-label,
+.site-meal-choice {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.site-meal-check-label input,
+.site-meal-choice input {
+    width: 20px;
+    height: 20px;
+    accent-color: #0057ff;
+}
+
+.site-meal-actions {
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.site-meal-default-notice {
+    margin-bottom: 12px;
+}
+
+.site-meal-modal {
+    position: fixed;
+    z-index: 10000;
+    inset: 0;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    padding: 20px;
+}
+
+.site-meal-modal-backdrop {
+    position: absolute;
+    border: 0;
+    background: rgba(15, 23, 42, 0.58);
+    cursor: default;
+    inset: 0;
+}
+
+.site-meal-modal-dialog {
+    position: relative;
+    display: flex;
+    width: min(1100px, 100%);
+    max-height: min(84vh, 820px);
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.3);
+}
+
+.site-meal-modal-header,
+.site-meal-modal-footer {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 15px 18px;
+}
+
+.site-meal-modal-header {
+    border-bottom: 1px solid #e5eaf1;
+}
+
+.site-meal-modal-footer {
+    justify-content: flex-end;
+    border-top: 1px solid #e5eaf1;
+}
+
+.site-meal-modal-header h2 {
+    margin: 2px 0 0;
+    font-size: 20px;
+}
+
+.site-meal-modal-kicker,
+.site-meal-modal-meta {
+    margin: 0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.site-meal-modal-close {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #334155;
+    cursor: pointer;
+    font-size: 26px;
+}
+
+.site-meal-modal-body {
+    min-height: 0;
+    overflow: auto;
+    padding: 18px;
+}
+
+body.site-meal-modal-open {
+    overflow: hidden;
+}
+
+.site-meal-detail-cell {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.site-meal-detail-cell span {
+    border-radius: 4px;
+    padding: 3px 5px;
+    font-size: 11px;
+}
+
+.site-meal-detail-cell .is-selected {
+    background: #e7f8ef;
+    color: #087443;
+    font-weight: 750;
+}
+
+.site-meal-detail-cell .is-unselected {
+    color: #a0aaba;
+}
+
+.site-meal-public {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 10px 0 56px;
+}
+
+.site-meal-public-header {
+    margin-bottom: 22px;
+    text-align: center;
+}
+
+.site-meal-kicker {
+    margin: 0 0 7px;
+    color: #0057ff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+
+.site-meal-public-header h1 {
+    margin: 0;
+    color: #0f172a;
+    font-size: clamp(25px, 4vw, 34px);
+    line-height: 1.2;
+}
+
+.site-meal-public-header > p:last-child {
+    margin: 9px 0 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.site-meal-access-card {
+    width: min(500px, 100%);
+    margin: 28px auto 0;
+    padding: 28px;
+    text-align: center;
+}
+
+.site-meal-access-icon {
+    display: grid;
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 12px;
+    place-items: center;
+    border-radius: 50%;
+    background: #edf4ff;
+    font-size: 24px;
+}
+
+.site-meal-access-card h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 20px;
+}
+
+.site-meal-access-card > p {
+    margin: 8px 0 18px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.site-meal-password-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    text-align: left;
+}
+
+.site-meal-password-row label {
+    grid-column: 1 / -1;
+}
+
+.site-meal-password-row .site-button {
+    min-width: 84px;
+}
+
+.site-meal-access-state {
+    display: block;
+    min-height: 20px;
+    margin-top: 12px;
+    color: #b42318;
+    font-size: 12px;
+}
+
+.site-meal-survey-filter {
+    position: sticky;
+    z-index: 20;
+    top: 8px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+    padding: 14px;
+}
+
+.site-meal-survey-filter > div {
+    display: grid;
+    gap: 5px;
+}
+
+.site-meal-survey-filter .ui-select {
+    width: 100%;
+}
+
+.site-meal-survey-meta {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.site-meal-survey-meta-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.site-meal-add-member-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+.site-meal-survey-meta h2 + span {
+    display: block;
+    margin-top: 5px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.site-meal-selection-count {
+    color: #64748b;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.site-meal-selection-count strong {
+    color: #0057ff;
+    font-size: 19px;
+}
+
+.site-meal-modal[hidden] {
+    display: none;
+}
+
+.site-meal-add-member-dialog {
+    width: min(540px, 100%);
+}
+
+.site-meal-add-member-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.site-meal-add-member-field {
+    display: grid;
+    gap: 6px;
+}
+
+.site-meal-add-member-field.is-wide {
+    grid-column: 1 / -1;
+}
+
+.site-meal-add-member-field label {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.site-meal-add-member-field .ui-input,
+.site-meal-add-member-field .ui-select {
+    width: 100%;
+}
+
+.site-meal-survey-table thead th:first-child,
+.site-meal-survey-table tbody th {
+    min-width: 130px;
+    text-align: left;
+}
+
+.site-meal-survey-table tbody th {
+    background: #fff;
+}
+
+.site-meal-member-card.is-new-member > th,
+.site-meal-member-card.is-new-member > td {
+    background: #fff8d8;
+}
+
+.site-meal-member-card.is-new-member:focus {
+    outline: 3px solid rgba(0, 87, 255, 0.35);
+    outline-offset: 2px;
+}
+
+.site-meal-survey-table tbody th span {
+    display: block;
+    margin-top: 3px;
+    color: #8a96a8;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.site-meal-member-heading {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.site-meal-member-toggle {
+    display: inline-flex;
+    min-height: 30px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #b9c8dc;
+    border-radius: 999px;
+    background: #fff;
+    color: #31506f;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 750;
+    line-height: 1;
+    padding: 5px 9px;
+    white-space: nowrap;
+}
+
+.site-meal-member-toggle:hover,
+.site-meal-member-toggle:focus-visible {
+    border-color: #0057ff;
+    color: #0057ff;
+    outline: none;
+}
+
+.site-meal-member-toggle[aria-pressed="true"] {
+    border-color: #8eb4ff;
+    background: #edf4ff;
+    color: #0046ce;
+}
+
+.site-meal-cell-options {
+    display: flex;
+    min-width: 150px;
+    flex-wrap: wrap;
+    gap: 4px 9px;
+    justify-content: center;
+}
+
+.site-meal-choice {
+    gap: 5px;
+    min-width: 44px;
+    color: #334155;
+    font-size: 12px;
+}
+
+.site-meal-public-actions {
+    position: sticky;
+    z-index: 15;
+    bottom: 0;
+    display: flex;
+    margin: 18px -8px 0;
+    padding: 12px 8px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 -8px 20px rgba(15, 23, 42, 0.06);
+    backdrop-filter: blur(8px);
+}
+
+.site-meal-public-actions .site-button {
+    min-width: 170px;
+}
+
+.site-empty-state {
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #64748b;
+    padding: 30px 16px;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .site-meal-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .site-meal-admin-main {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .site-meal-control-card {
+        padding: 13px 13px 0;
+    }
+
+    .site-meal-filterbar {
+        display: grid;
+        gap: 5px;
+    }
+
+    .site-meal-filterbar .ui-select {
+        width: 100%;
+    }
+
+    .site-meal-tabs a {
+        flex: 1 1 50%;
+        justify-content: center;
+        padding: 0 8px;
+    }
+
+    .site-meal-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .site-meal-excel-button {
+        width: 100%;
+    }
+
+    .site-meal-summary-grid {
+        gap: 12px;
+    }
+
+    .site-meal-card-header {
+        padding: 14px 13px 10px;
+    }
+
+    .site-meal-card-footer {
+        padding-right: 13px;
+        padding-left: 13px;
+    }
+
+    .site-meal-modal {
+        align-items: end;
+        padding: 0;
+    }
+
+    .site-meal-modal-dialog {
+        width: 100%;
+        max-height: 92vh;
+        border-radius: 14px 14px 0 0;
+    }
+
+    .site-meal-modal-header,
+    .site-meal-modal-body,
+    .site-meal-modal-footer {
+        padding: 14px;
+    }
+
+    .site-meal-public {
+        width: calc(100% - 24px);
+        padding-top: 2px;
+    }
+
+    .site-meal-public-header {
+        margin-bottom: 16px;
+        text-align: left;
+    }
+
+    .site-meal-public-header > p:last-child {
+        font-size: 13px;
+    }
+
+    .site-meal-access-card {
+        margin-top: 16px;
+        padding: 22px 16px;
+    }
+
+    .site-meal-password-row {
+        grid-template-columns: 1fr;
+    }
+
+    .site-meal-password-row .site-button {
+        width: 100%;
+        min-height: 46px;
+    }
+
+    .site-meal-survey-filter {
+        top: 4px;
+        grid-template-columns: 1fr;
+        gap: 9px;
+        margin-right: -4px;
+        margin-left: -4px;
+        padding: 11px;
+    }
+
+    .site-meal-survey-meta {
+        align-items: flex-start;
+    }
+
+    .site-meal-survey-meta-actions {
+        align-items: flex-end;
+        flex-direction: column-reverse;
+        gap: 7px;
+    }
+
+    .site-meal-add-member-row .site-button {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .site-meal-survey-meta h2 {
+        font-size: 18px;
+    }
+
+    .site-meal-survey-table-wrap {
+        overflow: visible;
+    }
+
+    .site-meal-survey-table,
+    .site-meal-survey-table tbody,
+    .site-meal-survey-table tr,
+    .site-meal-survey-table th,
+    .site-meal-survey-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .site-meal-survey-table {
+        border: 0;
+    }
+
+    .site-meal-survey-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        clip-path: inset(50%);
+    }
+
+    .site-meal-member-card {
+        margin-bottom: 12px;
+        overflow: hidden;
+        border: 1px solid #dbe3ee;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+    }
+
+    .site-meal-survey-table tbody th {
+        min-width: 0;
+        border: 0;
+        border-bottom: 1px solid #e8edf4;
+        background: #f8fafc;
+        padding: 12px 13px;
+    }
+
+    .site-meal-member-heading {
+        justify-content: space-between;
+    }
+
+    .site-meal-survey-table tbody td {
+        display: grid;
+        grid-template-columns: 84px minmax(0, 1fr);
+        align-items: center;
+        border: 0;
+        border-bottom: 1px solid #edf0f5;
+        padding: 8px 10px;
+        text-align: left;
+    }
+
+    .site-meal-survey-table tbody td:last-child {
+        border-bottom: 0;
+    }
+
+    .site-meal-survey-table tbody td::before {
+        color: #475569;
+        content: attr(data-date-label);
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    .site-meal-cell-options {
+        min-width: 0;
+        justify-content: flex-start;
+    }
+
+    .site-meal-choice {
+        min-height: 44px;
+        padding: 0 2px;
+    }
+
+    .site-meal-public-actions .site-button {
+        width: 100%;
+        min-height: 48px;
+    }
+
+    .site-meal-add-member-form {
+        grid-template-columns: 1fr;
+    }
+
+    .site-meal-add-member-field.is-wide {
+        grid-column: auto;
+    }
+}
+
+@media (pointer: coarse) {
+    .site-meal-member-toggle {
+        min-height: 44px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-meal-tabs a,
+    .site-meal-modal-dialog {
+        scroll-behavior: auto;
+        transition: none;
+    }
+}

@@ -13,5 +13,16 @@
     "Password": "######",
     "EnableSsl": true,
     "DefaultCredentials": false
+  },
+  "MealPrecheck": {
+    "PasswordHash": "REPLACE_WITH_BASE64_PBKDF2_HASH",
+    "PasswordSalt": "REPLACE_WITH_BASE64_RANDOM_SALT",
+    "PasswordIterations": 150000,
+    "HmacKey": "REPLACE_WITH_BASE64_RANDOM_HMAC_KEY",
+    "MaxAttempts": 5,
+    "AttemptWindowMinutes": 10,
+    "LockoutMinutes": 10,
+    "SessionHours": 2,
+    "MaxRetreatDays": 31
   }
 }
