@@ -95,7 +95,7 @@ public partial class staff_mealstatus_excel_export : Page
             + DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture)
             + ".xlsx";
 
-        XlsxExportHelper.WriteDataTableToResponse(Response, exportTable, fileName, "식사선택상세", true);
+        XlsxExportHelper.WriteDataTableToResponse(Response, exportTable, fileName, "식사선택상세", true, true);
     }
 
     private static List<GroupExportData> LoadGroupDetails(int retreatCode, DataTable groupTable)

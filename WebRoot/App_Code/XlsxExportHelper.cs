@@ -18,12 +18,17 @@ public static class XlsxExportHelper
 
     public static void WriteDataTableToResponse(HttpResponse response, DataTable table, string fileName, string sheetName, bool autoFitColumns)
     {
+        WriteDataTableToResponse(response, table, fileName, sheetName, autoFitColumns, false);
+    }
+
+    public static void WriteDataTableToResponse(HttpResponse response, DataTable table, string fileName, string sheetName, bool autoFitColumns, bool freezeFirstRow)
+    {
         if (!fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
             fileName += ".xlsx";
 
         using (MemoryStream workbookStream = new MemoryStream())
         {
-            WriteWorkbook(workbookStream, table, sheetName, autoFitColumns);
+            WriteWorkbook(workbookStream, table, sheetName, autoFitColumns, freezeFirstRow);
 
             response.Clear();
             response.Buffer = true;
@@ -38,7 +43,7 @@ public static class XlsxExportHelper
         }
     }
 
-    private static void WriteWorkbook(Stream output, DataTable table, string sheetName, bool autoFitColumns)
+    private static void WriteWorkbook(Stream output, DataTable table, string sheetName, bool autoFitColumns, bool freezeFirstRow)
     {
         using (Package package = Package.Open(output, FileMode.Create, FileAccess.ReadWrite))
         {
@@ -75,19 +80,27 @@ public static class XlsxExportHelper
                 RelationshipsNs + "/styles",
                 "rId2");
 
-            WriteWorkbookXml(workbookPart, sheetName);
-            WriteWorksheetXml(worksheetPart, table, autoFitColumns);
+            WriteWorkbookXml(workbookPart, sheetName, freezeFirstRow);
+            WriteWorksheetXml(worksheetPart, table, autoFitColumns, freezeFirstRow);
             WriteStylesXml(stylesPart);
         }
     }
 
-    private static void WriteWorkbookXml(PackagePart workbookPart, string sheetName)
+    private static void WriteWorkbookXml(PackagePart workbookPart, string sheetName, bool freezeFirstRow)
     {
         using (XmlWriter writer = CreateXmlWriter(workbookPart.GetStream()))
         {
             writer.WriteStartDocument(true);
             writer.WriteStartElement("workbook", SpreadsheetNs);
             writer.WriteAttributeString("xmlns", "r", null, RelationshipsNs);
+            if (freezeFirstRow)
+            {
+                writer.WriteStartElement("bookViews", SpreadsheetNs);
+                writer.WriteStartElement("workbookView", SpreadsheetNs);
+                writer.WriteAttributeString("activeTab", "0");
+                writer.WriteEndElement();
+                writer.WriteEndElement();
+            }
             writer.WriteStartElement("sheets", SpreadsheetNs);
             writer.WriteStartElement("sheet", SpreadsheetNs);
             writer.WriteAttributeString("name", CleanSheetName(sheetName));
@@ -100,7 +113,7 @@ public static class XlsxExportHelper
         }
     }
 
-    private static void WriteWorksheetXml(PackagePart worksheetPart, DataTable table, bool autoFitColumns)
+    private static void WriteWorksheetXml(PackagePart worksheetPart, DataTable table, bool autoFitColumns, bool freezeFirstRow)
     {
         int rowCount = Math.Max(1, table.Rows.Count + 1);
         int columnCount = Math.Max(1, table.Columns.Count);
@@ -112,6 +125,8 @@ public static class XlsxExportHelper
             writer.WriteStartElement("dimension", SpreadsheetNs);
             writer.WriteAttributeString("ref", "A1:" + GetCellReference(columnCount, rowCount));
             writer.WriteEndElement();
+            if (freezeFirstRow)
+                WriteFrozenFirstRowXml(writer);
             if (autoFitColumns)
                 WriteColumnsXml(writer, table);
             writer.WriteStartElement("sheetData", SpreadsheetNs);
@@ -150,6 +165,26 @@ public static class XlsxExportHelper
             writer.WriteEndElement();
             writer.WriteEndDocument();
         }
+    }
+
+    private static void WriteFrozenFirstRowXml(XmlWriter writer)
+    {
+        writer.WriteStartElement("sheetViews", SpreadsheetNs);
+        writer.WriteStartElement("sheetView", SpreadsheetNs);
+        writer.WriteAttributeString("workbookViewId", "0");
+        writer.WriteStartElement("pane", SpreadsheetNs);
+        writer.WriteAttributeString("ySplit", "1");
+        writer.WriteAttributeString("topLeftCell", "A2");
+        writer.WriteAttributeString("activePane", "bottomLeft");
+        writer.WriteAttributeString("state", "frozen");
+        writer.WriteEndElement();
+        writer.WriteStartElement("selection", SpreadsheetNs);
+        writer.WriteAttributeString("pane", "bottomLeft");
+        writer.WriteAttributeString("activeCell", "A2");
+        writer.WriteAttributeString("sqref", "A2");
+        writer.WriteEndElement();
+        writer.WriteEndElement();
+        writer.WriteEndElement();
     }
 
     private static void WriteColumnsXml(XmlWriter writer, DataTable table)
