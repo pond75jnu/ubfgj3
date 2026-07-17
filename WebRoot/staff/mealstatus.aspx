@@ -3,8 +3,8 @@
 <%@ Register TagPrefix="ubfgj3_uc" TagName="left_menu" Src="~/userControl/left_menu.ascx" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
-    <link rel="stylesheet" href="/common/css/meal-precheck.css?v=meal-precheck-10" />
-    <script defer src="/common/js/meal-precheck.js?v=meal-precheck-10"></script>
+    <link rel="stylesheet" href="/common/css/meal-precheck.css?v=meal-precheck-11" />
+    <script defer src="/common/js/meal-precheck.js?v=meal-precheck-11"></script>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">

@@ -1041,11 +1041,13 @@ body.site-meal-modal-open {
         display: grid;
         width: 100%;
         min-width: 0;
-        grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+        grid-template-columns: repeat(auto-fill, 118px);
         gap: 8px;
+        justify-content: start;
     }
 
     .site-meal-manual-option {
+        width: 118px;
         min-height: 52px;
         grid-template-columns: minmax(28px, auto) minmax(58px, 1fr) auto;
         border: 1px solid #e1e7ef;
