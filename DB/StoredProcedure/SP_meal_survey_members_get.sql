@@ -49,7 +49,8 @@ BEGIN
            @RosterHash AS roster_hash,
            @ConfigRevision AS config_revision,
            ISNULL(H.revision, 0) AS submission_revision,
-           ISNULL(H.entry_mode, 'P') AS entry_mode,
+           CASE WHEN @MemberCount = 0 THEN 'M' ELSE 'P' END AS entry_mode,
+           H.entry_mode AS last_saved_entry_mode,
            H.submitted_dt,
            CASE WHEN H.seq IS NULL THEN N'NOT_SUBMITTED'
                 WHEN H.roster_hash <> @RosterHash
@@ -119,6 +120,7 @@ BEGIN
      INNER JOIN dbo.meal_survey_selection S ON S.submission_seq = H.seq
      WHERE H.retreat = @RETREAT
        AND H.belong = @BELONG
+       AND @MemberCount > 0
      ORDER BY S.group_member_seq,
               S.meal_date,
               CASE S.meal_type WHEN 'B' THEN 1 WHEN 'L' THEN 2 ELSE 3 END;
@@ -130,7 +132,7 @@ BEGIN
      INNER JOIN dbo.meal_survey_manual_count C ON C.submission_seq = H.seq
      WHERE H.retreat = @RETREAT
        AND H.belong = @BELONG
-       AND H.entry_mode = 'M'
+       AND @MemberCount = 0
      ORDER BY C.meal_date,
               CASE C.meal_type WHEN 'B' THEN 1 WHEN 'L' THEN 2 ELSE 3 END;
 END

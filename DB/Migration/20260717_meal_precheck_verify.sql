@@ -91,15 +91,6 @@ IF EXISTS
 )
     THROW 50113, N'고아 직접입력 식사 수량 데이터가 있습니다.', 1;
 
-IF EXISTS
-(
-    SELECT 1
-      FROM dbo.meal_survey_manual_count C
-     INNER JOIN dbo.meal_survey_submission H ON H.seq = C.submission_seq
-     WHERE H.entry_mode <> 'M'
-)
-    THROW 50114, N'직접입력 식사 수량과 제출 입력 방식이 일치하지 않습니다.', 1;
-
 SELECT N'OK' AS result_code,
        (SELECT COUNT(*) FROM dbo.meal_service_config) AS config_count,
        (SELECT COUNT(*) FROM dbo.meal_survey_submission) AS submission_count,

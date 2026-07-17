@@ -1371,6 +1371,13 @@ BEGIN
          INNER JOIN dbo.meal_survey_submission H
             ON H.seq = S.submission_seq
            AND H.retreat = @RETREAT
+           AND EXISTS
+               (
+                   SELECT 1
+                     FROM dbo.group_members M
+                    WHERE M.retreat = H.retreat
+                      AND M.belong = H.belong
+               )
          INNER JOIN @Current C
             ON C.meal_date = S.meal_date
            AND C.meal_type = S.meal_type
@@ -1385,7 +1392,13 @@ BEGIN
          INNER JOIN dbo.meal_survey_submission H
             ON H.seq = C.submission_seq
            AND H.retreat = @RETREAT
-           AND H.entry_mode = 'M'
+           AND NOT EXISTS
+               (
+                   SELECT 1
+                     FROM dbo.group_members M
+                    WHERE M.retreat = H.retreat
+                      AND M.belong = H.belong
+               )
          INNER JOIN @Current O
             ON O.meal_date = C.meal_date
            AND O.meal_type = C.meal_type
@@ -1477,6 +1490,13 @@ BEGIN
              INNER JOIN dbo.meal_survey_submission H
                 ON H.seq = S.submission_seq
                AND H.retreat = @RETREAT
+               AND EXISTS
+                   (
+                       SELECT 1
+                         FROM dbo.group_members M
+                        WHERE M.retreat = H.retreat
+                          AND M.belong = H.belong
+                   )
              INNER JOIN @Config C
                 ON C.meal_date = S.meal_date
                AND C.meal_type = S.meal_type
@@ -1487,6 +1507,13 @@ BEGIN
              INNER JOIN dbo.meal_survey_submission H
                 ON H.seq = C.submission_seq
                AND H.retreat = @RETREAT
+               AND NOT EXISTS
+                   (
+                       SELECT 1
+                         FROM dbo.group_members M
+                        WHERE M.retreat = H.retreat
+                          AND M.belong = H.belong
+                   )
              INNER JOIN @Config N
                 ON N.meal_date = C.meal_date
                AND N.meal_type = C.meal_type
@@ -1601,7 +1628,8 @@ BEGIN
 
     UPDATE I
        SET member_count = X.member_count,
-           roster_hash = CONVERT(CHAR(64), HASHBYTES('SHA2_256', ISNULL(X.roster_list, N'')), 2)
+           roster_hash = CONVERT(CHAR(64), HASHBYTES('SHA2_256', ISNULL(X.roster_list, N'')), 2),
+           entry_mode = CASE WHEN X.member_count = 0 THEN 'M' ELSE 'P' END
       FROM @GroupInfo I
      CROSS APPLY
      (
@@ -1616,7 +1644,6 @@ BEGIN
     UPDATE I
        SET submitted_dt = H.submitted_dt,
            submission_revision = ISNULL(H.revision, 0),
-           entry_mode = ISNULL(H.entry_mode, 'P'),
            submission_status =
                CASE WHEN H.seq IS NULL THEN N'NOT_SUBMITTED'
                     WHEN H.roster_hash <> I.roster_hash
@@ -1642,7 +1669,7 @@ BEGIN
             AND E.provide_yn = 'Y'
           WHERE H.retreat = @RETREAT
             AND H.belong = I.belong
-            AND H.entry_mode = 'P'
+            AND I.member_count > 0
      ) X;
 
     DECLARE @GroupCount INT = (SELECT COUNT(*) FROM @GroupInfo);
@@ -1735,7 +1762,13 @@ BEGIN
                            AND G.retreat = H.retreat
                            AND ISNULL(G.etc1, N'N') = N'Y'
                          WHERE H.retreat = @RETREAT
-                           AND H.entry_mode = 'P'
+                           AND EXISTS
+                               (
+                                   SELECT 1
+                                     FROM @GroupInfo I
+                                    WHERE I.belong = H.belong
+                                      AND I.member_count > 0
+                               )
                            AND (T.is_total = 1 OR H.belong = T.belong)
                            AND S.meal_date = E.meal_date
                            AND S.meal_type = E.meal_type
@@ -1752,7 +1785,6 @@ BEGIN
                             ON I.belong = H.belong
                            AND I.member_count = 0
                          WHERE H.retreat = @RETREAT
-                           AND H.entry_mode = 'M'
                            AND (T.is_total = 1 OR H.belong = T.belong)
                            AND C.meal_date = E.meal_date
                            AND C.meal_type = E.meal_type
@@ -1847,7 +1879,8 @@ BEGIN
            @RosterHash AS roster_hash,
            @ConfigRevision AS config_revision,
            ISNULL(H.revision, 0) AS submission_revision,
-           ISNULL(H.entry_mode, 'P') AS entry_mode,
+           CASE WHEN @MemberCount = 0 THEN 'M' ELSE 'P' END AS entry_mode,
+           H.entry_mode AS last_saved_entry_mode,
            H.submitted_dt,
            CASE WHEN H.seq IS NULL THEN N'NOT_SUBMITTED'
                 WHEN H.roster_hash <> @RosterHash
@@ -1917,6 +1950,7 @@ BEGIN
      INNER JOIN dbo.meal_survey_selection S ON S.submission_seq = H.seq
      WHERE H.retreat = @RETREAT
        AND H.belong = @BELONG
+       AND @MemberCount > 0
      ORDER BY S.group_member_seq,
               S.meal_date,
               CASE S.meal_type WHEN 'B' THEN 1 WHEN 'L' THEN 2 ELSE 3 END;
@@ -1928,7 +1962,7 @@ BEGIN
      INNER JOIN dbo.meal_survey_manual_count C ON C.submission_seq = H.seq
      WHERE H.retreat = @RETREAT
        AND H.belong = @BELONG
-       AND H.entry_mode = 'M'
+       AND @MemberCount = 0
      ORDER BY C.meal_date,
               CASE C.meal_type WHEN 'B' THEN 1 WHEN 'L' THEN 2 ELSE 3 END;
 END
@@ -2294,16 +2328,13 @@ BEGIN
              WHERE seq = @SubmissionSeq;
         END;
 
-        DELETE FROM dbo.meal_survey_selection
-         WHERE submission_seq = @SubmissionSeq;
-
-        DELETE FROM dbo.meal_survey_manual_count
-         WHERE submission_seq = @SubmissionSeq;
-
         DECLARE @SavedCount INT = 0;
 
         IF @EntryMode = 'P'
         BEGIN
+            DELETE FROM dbo.meal_survey_selection
+             WHERE submission_seq = @SubmissionSeq;
+
             INSERT INTO dbo.meal_survey_selection
             (
                 submission_seq,
@@ -2323,6 +2354,9 @@ BEGIN
         END
         ELSE
         BEGIN
+            DELETE FROM dbo.meal_survey_manual_count
+             WHERE submission_seq = @SubmissionSeq;
+
             INSERT INTO dbo.meal_survey_manual_count
             (
                 submission_seq,

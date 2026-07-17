@@ -354,16 +354,13 @@ BEGIN
              WHERE seq = @SubmissionSeq;
         END;
 
-        DELETE FROM dbo.meal_survey_selection
-         WHERE submission_seq = @SubmissionSeq;
-
-        DELETE FROM dbo.meal_survey_manual_count
-         WHERE submission_seq = @SubmissionSeq;
-
         DECLARE @SavedCount INT = 0;
 
         IF @EntryMode = 'P'
         BEGIN
+            DELETE FROM dbo.meal_survey_selection
+             WHERE submission_seq = @SubmissionSeq;
+
             INSERT INTO dbo.meal_survey_selection
             (
                 submission_seq,
@@ -383,6 +380,9 @@ BEGIN
         END
         ELSE
         BEGIN
+            DELETE FROM dbo.meal_survey_manual_count
+             WHERE submission_seq = @SubmissionSeq;
+
             INSERT INTO dbo.meal_survey_manual_count
             (
                 submission_seq,

@@ -87,7 +87,8 @@ BEGIN
 
     UPDATE I
        SET member_count = X.member_count,
-           roster_hash = CONVERT(CHAR(64), HASHBYTES('SHA2_256', ISNULL(X.roster_list, N'')), 2)
+           roster_hash = CONVERT(CHAR(64), HASHBYTES('SHA2_256', ISNULL(X.roster_list, N'')), 2),
+           entry_mode = CASE WHEN X.member_count = 0 THEN 'M' ELSE 'P' END
       FROM @GroupInfo I
      CROSS APPLY
      (
@@ -102,7 +103,6 @@ BEGIN
     UPDATE I
        SET submitted_dt = H.submitted_dt,
            submission_revision = ISNULL(H.revision, 0),
-           entry_mode = ISNULL(H.entry_mode, 'P'),
            submission_status =
                CASE WHEN H.seq IS NULL THEN N'NOT_SUBMITTED'
                     WHEN H.roster_hash <> I.roster_hash
@@ -128,7 +128,7 @@ BEGIN
             AND E.provide_yn = 'Y'
           WHERE H.retreat = @RETREAT
             AND H.belong = I.belong
-            AND H.entry_mode = 'P'
+            AND I.member_count > 0
      ) X;
 
     DECLARE @GroupCount INT = (SELECT COUNT(*) FROM @GroupInfo);
@@ -221,7 +221,13 @@ BEGIN
                            AND G.retreat = H.retreat
                            AND ISNULL(G.etc1, N'N') = N'Y'
                          WHERE H.retreat = @RETREAT
-                           AND H.entry_mode = 'P'
+                           AND EXISTS
+                               (
+                                   SELECT 1
+                                     FROM @GroupInfo I
+                                    WHERE I.belong = H.belong
+                                      AND I.member_count > 0
+                               )
                            AND (T.is_total = 1 OR H.belong = T.belong)
                            AND S.meal_date = E.meal_date
                            AND S.meal_type = E.meal_type
@@ -238,7 +244,6 @@ BEGIN
                             ON I.belong = H.belong
                            AND I.member_count = 0
                          WHERE H.retreat = @RETREAT
-                           AND H.entry_mode = 'M'
                            AND (T.is_total = 1 OR H.belong = T.belong)
                            AND C.meal_date = E.meal_date
                            AND C.meal_type = E.meal_type

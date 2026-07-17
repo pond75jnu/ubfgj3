@@ -183,6 +183,13 @@ BEGIN
          INNER JOIN dbo.meal_survey_submission H
             ON H.seq = S.submission_seq
            AND H.retreat = @RETREAT
+           AND EXISTS
+               (
+                   SELECT 1
+                     FROM dbo.group_members M
+                    WHERE M.retreat = H.retreat
+                      AND M.belong = H.belong
+               )
          INNER JOIN @Current C
             ON C.meal_date = S.meal_date
            AND C.meal_type = S.meal_type
@@ -197,7 +204,13 @@ BEGIN
          INNER JOIN dbo.meal_survey_submission H
             ON H.seq = C.submission_seq
            AND H.retreat = @RETREAT
-           AND H.entry_mode = 'M'
+           AND NOT EXISTS
+               (
+                   SELECT 1
+                     FROM dbo.group_members M
+                    WHERE M.retreat = H.retreat
+                      AND M.belong = H.belong
+               )
          INNER JOIN @Current O
             ON O.meal_date = C.meal_date
            AND O.meal_type = C.meal_type
@@ -289,6 +302,13 @@ BEGIN
              INNER JOIN dbo.meal_survey_submission H
                 ON H.seq = S.submission_seq
                AND H.retreat = @RETREAT
+               AND EXISTS
+                   (
+                       SELECT 1
+                         FROM dbo.group_members M
+                        WHERE M.retreat = H.retreat
+                          AND M.belong = H.belong
+                   )
              INNER JOIN @Config C
                 ON C.meal_date = S.meal_date
                AND C.meal_type = S.meal_type
@@ -299,6 +319,13 @@ BEGIN
              INNER JOIN dbo.meal_survey_submission H
                 ON H.seq = C.submission_seq
                AND H.retreat = @RETREAT
+               AND NOT EXISTS
+                   (
+                       SELECT 1
+                         FROM dbo.group_members M
+                        WHERE M.retreat = H.retreat
+                          AND M.belong = H.belong
+                   )
              INNER JOIN @Config N
                 ON N.meal_date = C.meal_date
                AND N.meal_type = C.meal_type
