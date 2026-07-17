@@ -6,8 +6,12 @@ IF OBJECT_ID(N'dbo.meal_survey_submission', N'U') IS NULL
     THROW 50102, N'meal_survey_submission 테이블이 없습니다.', 1;
 IF OBJECT_ID(N'dbo.meal_survey_selection', N'U') IS NULL
     THROW 50103, N'meal_survey_selection 테이블이 없습니다.', 1;
+IF OBJECT_ID(N'dbo.meal_survey_manual_count', N'U') IS NULL
+    THROW 50111, N'meal_survey_manual_count 테이블이 없습니다.', 1;
 IF OBJECT_ID(N'dbo.meal_access_guard', N'U') IS NULL
     THROW 50104, N'meal_access_guard 테이블이 없습니다.', 1;
+IF COL_LENGTH(N'dbo.meal_survey_submission', N'entry_mode') IS NULL
+    THROW 50112, N'meal_survey_submission.entry_mode 컬럼이 없습니다.', 1;
 
 DECLARE @RequiredProcedures TABLE (procedure_name SYSNAME PRIMARY KEY);
 INSERT INTO @RequiredProcedures (procedure_name)
@@ -78,8 +82,27 @@ IF EXISTS
 )
     THROW 50110, N'유효하지 않은 구성원의 식사 선택 데이터가 있습니다.', 1;
 
+IF EXISTS
+(
+    SELECT 1
+      FROM dbo.meal_survey_manual_count C
+      LEFT JOIN dbo.meal_survey_submission H ON H.seq = C.submission_seq
+     WHERE H.seq IS NULL
+)
+    THROW 50113, N'고아 직접입력 식사 수량 데이터가 있습니다.', 1;
+
+IF EXISTS
+(
+    SELECT 1
+      FROM dbo.meal_survey_manual_count C
+     INNER JOIN dbo.meal_survey_submission H ON H.seq = C.submission_seq
+     WHERE H.entry_mode <> 'M'
+)
+    THROW 50114, N'직접입력 식사 수량과 제출 입력 방식이 일치하지 않습니다.', 1;
+
 SELECT N'OK' AS result_code,
        (SELECT COUNT(*) FROM dbo.meal_service_config) AS config_count,
        (SELECT COUNT(*) FROM dbo.meal_survey_submission) AS submission_count,
        (SELECT COUNT(*) FROM dbo.meal_survey_selection) AS selection_count,
+       (SELECT COUNT(*) FROM dbo.meal_survey_manual_count) AS manual_count_row_count,
        (SELECT COUNT(*) FROM dbo.meal_access_guard) AS guard_count;

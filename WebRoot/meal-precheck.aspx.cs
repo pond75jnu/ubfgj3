@@ -184,7 +184,7 @@ public partial class meal_precheck : Page
         try
         {
             DataSet current = LoadSurveyData(belong);
-            if (current.Tables.Count < 4)
+            if (current.Tables.Count < 5)
             {
                 throw new InvalidOperationException("조사 자료가 올바르지 않습니다.");
             }
@@ -205,21 +205,52 @@ public partial class meal_precheck : Page
             }
 
             List<MealSelectionItem> selections = new List<MealSelectionItem>();
-            foreach (int memberSeq in members)
+            List<MealManualCountItem> manualCounts = new List<MealManualCountItem>();
+            if (members.Count > 0)
+            {
+                foreach (int memberSeq in members)
+                {
+                    foreach (string providedMeal in providedMeals)
+                    {
+                        string[] parts = providedMeal.Split('|');
+                        string key = "meal_" + memberSeq.ToString(CultureInfo.InvariantCulture) + "_" + parts[0] + "_" + parts[1];
+                        if (String.Equals(Request.Form[key], "Y", StringComparison.Ordinal))
+                        {
+                            selections.Add(new MealSelectionItem
+                            {
+                                GroupMemberSeq = memberSeq,
+                                MealDate = parts[0],
+                                MealType = parts[1]
+                            });
+                        }
+                    }
+                }
+            }
+            else
             {
                 foreach (string providedMeal in providedMeals)
                 {
                     string[] parts = providedMeal.Split('|');
-                    string key = "meal_" + memberSeq.ToString(CultureInfo.InvariantCulture) + "_" + parts[0] + "_" + parts[1];
-                    if (String.Equals(Request.Form[key], "Y", StringComparison.Ordinal))
+                    string key = "meal_count_" + parts[0] + "_" + parts[1];
+                    int count;
+                    if (!Int32.TryParse((Request.Form[key] ?? String.Empty).Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out count)
+                        || count < 0
+                        || count > 9999)
                     {
-                        selections.Add(new MealSelectionItem
-                        {
-                            GroupMemberSeq = memberSeq,
-                            MealDate = parts[0],
-                            MealType = parts[1]
-                        });
+                        BindSurvey();
+                        ShowMessage(
+                            MealPrecheckHelper.FormatDate(parts[0]) + " " + MealPrecheckHelper.GetMealName(parts[1])
+                            + " 식사 수량은 0부터 9,999까지의 숫자로 입력하세요.",
+                            true);
+                        return;
                     }
+
+                    manualCounts.Add(new MealManualCountItem
+                    {
+                        MealDate = parts[0],
+                        MealType = parts[1],
+                        MealCount = count
+                    });
                 }
             }
 
@@ -230,13 +261,16 @@ public partial class meal_precheck : Page
             }
 
             string xml = MealPrecheckHelper.BuildSelectionXml(selections);
+            string countXml = MealPrecheckHelper.BuildManualCountXml(manualCounts);
             SqlParameter xmlParameter = new SqlParameter("@SELECTION_XML", SqlDbType.Xml) { Value = xml };
+            SqlParameter countXmlParameter = new SqlParameter("@MANUAL_COUNT_XML", SqlDbType.Xml) { Value = countXml };
             DataSet result = EfStoredProcedure.ExecuteDataSet(
                 "ubfgj3.dbo.SP_meal_survey_save",
                 new SqlParameter("@RETREAT", _retreatCode),
                 new SqlParameter("@BELONG", belong),
                 new SqlParameter("@EXPECTED_REVISION", expectedRevision),
                 xmlParameter,
+                countXmlParameter,
                 new SqlParameter("@BROWSER_KEY_HASH", _browserHash),
                 new SqlParameter("@IP_HASH", _ipHash),
                 new SqlParameter("@UID", _isLoginAuthorized ? _loginUserId : "meal-precheck"),
@@ -305,7 +339,7 @@ public partial class meal_precheck : Page
         try
         {
             DataSet groupData = LoadSurveyData(belong);
-            if (groupData.Tables.Count < 4 || groupData.Tables[0].Rows.Count == 0)
+            if (groupData.Tables.Count < 5 || groupData.Tables[0].Rows.Count == 0)
             {
                 throw new InvalidOperationException("활성 요회 정보를 찾을 수 없습니다.");
             }
@@ -546,7 +580,7 @@ public partial class meal_precheck : Page
         try
         {
             DataSet data = LoadSurveyData(belong);
-            if (data.Tables.Count < 4 || data.Tables[0].Rows.Count == 0)
+            if (data.Tables.Count < 5 || data.Tables[0].Rows.Count == 0)
             {
                 throw new InvalidOperationException("조사 자료가 올바르지 않습니다.");
             }
@@ -555,8 +589,8 @@ public partial class meal_precheck : Page
             lblGroupTitle.Text = Server.HtmlEncode(Convert.ToString(meta["belong_nm"])) + " 식사 조사";
             hdSubmissionRevision.Value = Convert.ToString(meta["submission_revision"], CultureInfo.InvariantCulture);
             lblSubmissionState.Text = BuildSubmissionState(meta);
-            litSurvey.Text = BuildSurveyHtml(data.Tables[1], data.Tables[2], data.Tables[3]);
-            btnSaveSurvey.Enabled = data.Tables[1].Rows.Count > 0 && data.Tables[2].Select("provide_yn = 'Y'").Length > 0;
+            litSurvey.Text = BuildSurveyHtml(data.Tables[1], data.Tables[2], data.Tables[3], data.Tables[4]);
+            btnSaveSurvey.Enabled = data.Tables[2].Select("provide_yn = 'Y'").Length > 0;
         }
         catch (Exception ex)
         {
@@ -670,13 +704,8 @@ public partial class meal_precheck : Page
         return Server.HtmlEncode(text);
     }
 
-    private string BuildSurveyHtml(DataTable members, DataTable schedule, DataTable selections)
+    private string BuildSurveyHtml(DataTable members, DataTable schedule, DataTable selections, DataTable manualCounts)
     {
-        if (members.Rows.Count == 0)
-        {
-            return "<div class='site-empty-state'>등록된 구성원이 없습니다.</div>";
-        }
-
         List<string> dates = new List<string>();
         Dictionary<string, List<string>> mealsByDate = new Dictionary<string, List<string>>(StringComparer.Ordinal);
         foreach (DataRow row in schedule.Rows)
@@ -694,6 +723,14 @@ public partial class meal_precheck : Page
         if (dates.Count == 0)
         {
             return "<div class='site-empty-state'>조사할 식사가 없습니다. 실무자에게 문의하세요.</div>";
+        }
+
+        Dictionary<string, int> savedManualCounts = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (DataRow row in manualCounts.Rows)
+        {
+            savedManualCounts[
+                Convert.ToString(row["meal_date"]) + "|" + Convert.ToString(row["meal_type"])] =
+                Convert.ToInt32(row["meal_count"], CultureInfo.InvariantCulture);
         }
 
         HashSet<string> selected = new HashSet<string>(StringComparer.Ordinal);
@@ -715,6 +752,37 @@ public partial class meal_precheck : Page
                 .Append(Server.HtmlEncode(MealPrecheckHelper.FormatDate(date))).Append("</th>");
         }
         html.Append("</tr></thead><tbody>");
+
+        if (members.Rows.Count == 0)
+        {
+            html.Append("<tr class='site-meal-member-card site-meal-manual-card' data-meal-manual-row='true'><th scope='row'>")
+                .Append("<div class='site-meal-member-heading'><strong>전체 대상</strong></div>")
+                .Append("<small>구성원 미등록 · 식사별 수량 직접입력</small></th>");
+
+            foreach (string date in dates)
+            {
+                html.Append("<td data-date-label='").Append(Server.HtmlEncode(MealPrecheckHelper.FormatDate(date)))
+                    .Append("'><div class='site-meal-cell-options site-meal-manual-options'>");
+                foreach (string type in mealsByDate[date])
+                {
+                    string countKey = date + "|" + type;
+                    int savedCount = savedManualCounts.ContainsKey(countKey) ? savedManualCounts[countKey] : 0;
+                    string name = "meal_count_" + date + "_" + type;
+                    string id = "mealCount_" + date + "_" + type;
+                    string mealName = MealPrecheckHelper.GetMealName(type);
+                    html.Append("<label class='site-meal-manual-option' for='").Append(id).Append("'><span>")
+                        .Append(mealName).Append("</span><input type='text' id='").Append(id)
+                        .Append("' name='").Append(name)
+                        .Append("' value='").Append(savedCount.ToString(CultureInfo.InvariantCulture))
+                        .Append("' inputmode='numeric' pattern='[0-9]*' maxlength='4' autocomplete='off'")
+                        .Append(" class='site-meal-manual-input' data-meal-manual-count='true' aria-label='")
+                        .Append(Server.HtmlEncode(MealPrecheckHelper.FormatDate(date) + " " + mealName + " 식사 인원"))
+                        .Append("' /><span class='site-meal-manual-unit'>명</span></label>");
+                }
+                html.Append("</div></td>");
+            }
+            html.Append("</tr>");
+        }
 
         foreach (DataRow member in members.Rows)
         {

@@ -3,6 +3,7 @@
     @BELONG INT,
     @EXPECTED_REVISION INT,
     @SELECTION_XML XML,
+    @MANUAL_COUNT_XML XML,
     @BROWSER_KEY_HASH CHAR(64),
     @IP_HASH CHAR(64),
     @UID NVARCHAR(50),
@@ -94,6 +95,55 @@ BEGIN
            CONVERT(CHAR(1), meal_type)
       FROM @RawSelection;
 
+    DECLARE @RawManualCount TABLE
+    (
+        meal_date NVARCHAR(30) NULL,
+        meal_type NVARCHAR(10) NULL,
+        meal_count_text NVARCHAR(30) NULL
+    );
+
+    INSERT INTO @RawManualCount (meal_date, meal_type, meal_count_text)
+    SELECT T.N.value(N'@date', N'nvarchar(30)'),
+           T.N.value(N'@type', N'nvarchar(10)'),
+           T.N.value(N'@count', N'nvarchar(30)')
+      FROM @MANUAL_COUNT_XML.nodes(N'/counts/item') AS T(N);
+
+    IF EXISTS
+    (
+        SELECT 1
+          FROM @RawManualCount
+         WHERE LEN(ISNULL(meal_date, N'')) <> 8
+            OR meal_date LIKE N'%[^0-9]%'
+            OR TRY_CONVERT(DATE, meal_date, 112) IS NULL
+            OR meal_type NOT IN (N'B', N'L', N'D')
+            OR TRY_CONVERT(INT, meal_count_text) IS NULL
+            OR TRY_CONVERT(INT, meal_count_text) NOT BETWEEN 0 AND 9999
+    )
+        THROW 50370, N'직접입력 식사 수량 payload가 올바르지 않습니다.', 1;
+
+    IF EXISTS
+    (
+        SELECT meal_date, meal_type
+          FROM @RawManualCount
+         GROUP BY meal_date, meal_type
+        HAVING COUNT(*) <> 1
+    )
+        THROW 50373, N'직접입력 식사 수량 payload에 중복 항목이 있습니다.', 1;
+
+    DECLARE @ManualCount TABLE
+    (
+        meal_date CHAR(8) NOT NULL,
+        meal_type CHAR(1) NOT NULL,
+        meal_count INT NOT NULL,
+        PRIMARY KEY (meal_date, meal_type)
+    );
+
+    INSERT INTO @ManualCount (meal_date, meal_type, meal_count)
+    SELECT CONVERT(CHAR(8), meal_date),
+           CONVERT(CHAR(1), meal_type),
+           TRY_CONVERT(INT, meal_count_text)
+      FROM @RawManualCount;
+
     BEGIN TRY
         SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
         BEGIN TRANSACTION;
@@ -118,21 +168,6 @@ BEGIN
                    0 AS saved_count;
             RETURN;
         END;
-
-        IF EXISTS
-        (
-            SELECT 1
-              FROM @Selection S
-             WHERE NOT EXISTS
-                   (
-                       SELECT 1
-                         FROM dbo.group_members M
-                        WHERE M.seq = S.group_member_seq
-                          AND M.retreat = @RETREAT
-                          AND M.belong = @BELONG
-                   )
-        )
-            THROW 50368, N'다른 요회 또는 유효하지 않은 구성원이 포함되어 있습니다.', 1;
 
         DECLARE @Effective TABLE
         (
@@ -175,6 +210,75 @@ BEGIN
            AND C.meal_type = M.meal_type
         OPTION (MAXRECURSION 366);
 
+        DECLARE @MemberCount INT;
+        DECLARE @RosterList NVARCHAR(MAX);
+        DECLARE @RosterHash CHAR(64);
+        DECLARE @ConfigRevision INT;
+        DECLARE @NewRevision INT = @CurrentRevision + 1;
+        DECLARE @EntryMode CHAR(1);
+
+        SELECT @MemberCount = COUNT(*),
+               @RosterList = STRING_AGG(CONVERT(NVARCHAR(MAX), seq), N',')
+                             WITHIN GROUP (ORDER BY seq)
+          FROM dbo.group_members WITH (HOLDLOCK)
+         WHERE retreat = @RETREAT
+           AND belong = @BELONG;
+
+        SET @EntryMode = CASE WHEN @MemberCount = 0 THEN 'M' ELSE 'P' END;
+
+        IF @EntryMode = 'M' AND EXISTS (SELECT 1 FROM @Selection)
+            THROW 50374, N'구성원이 없는 요회에는 개인별 식사 선택을 저장할 수 없습니다.', 1;
+
+        IF @EntryMode = 'P' AND EXISTS (SELECT 1 FROM @ManualCount)
+            THROW 50375, N'구성원이 등록된 요회에는 직접입력 식사 수량을 저장할 수 없습니다.', 1;
+
+        IF @EntryMode = 'M'
+           AND
+           (
+               EXISTS
+               (
+                   SELECT 1
+                     FROM @ManualCount C
+                    WHERE NOT EXISTS
+                          (
+                              SELECT 1
+                                FROM @Effective E
+                               WHERE E.meal_date = C.meal_date
+                                 AND E.meal_type = C.meal_type
+                                 AND E.provide_yn = 'Y'
+                          )
+               )
+               OR EXISTS
+               (
+                   SELECT 1
+                     FROM @Effective E
+                    WHERE E.provide_yn = 'Y'
+                      AND NOT EXISTS
+                          (
+                              SELECT 1
+                                FROM @ManualCount C
+                               WHERE C.meal_date = E.meal_date
+                                 AND C.meal_type = E.meal_type
+                          )
+               )
+           )
+            THROW 50376, N'제공되는 모든 식사의 직접입력 수량이 필요합니다.', 1;
+
+        IF EXISTS
+        (
+            SELECT 1
+              FROM @Selection S
+             WHERE NOT EXISTS
+                   (
+                       SELECT 1
+                         FROM dbo.group_members M
+                        WHERE M.seq = S.group_member_seq
+                          AND M.retreat = @RETREAT
+                          AND M.belong = @BELONG
+                   )
+        )
+            THROW 50368, N'다른 요회 또는 유효하지 않은 구성원이 포함되어 있습니다.', 1;
+
         IF EXISTS
         (
             SELECT 1
@@ -189,19 +293,6 @@ BEGIN
                    )
         )
             THROW 50369, N'제공되지 않거나 기간 밖인 식사가 포함되어 있습니다.', 1;
-
-        DECLARE @MemberCount INT;
-        DECLARE @RosterList NVARCHAR(MAX);
-        DECLARE @RosterHash CHAR(64);
-        DECLARE @ConfigRevision INT;
-        DECLARE @NewRevision INT = @CurrentRevision + 1;
-
-        SELECT @MemberCount = COUNT(*),
-               @RosterList = STRING_AGG(CONVERT(NVARCHAR(MAX), seq), N',')
-                             WITHIN GROUP (ORDER BY seq)
-          FROM dbo.group_members
-         WHERE retreat = @RETREAT
-           AND belong = @BELONG;
 
         SET @RosterHash = CONVERT(CHAR(64), HASHBYTES('SHA2_256', ISNULL(@RosterList, N'')), 2);
 
@@ -218,6 +309,7 @@ BEGIN
                 revision,
                 meal_config_revision,
                 submitted_member_count,
+                entry_mode,
                 roster_hash,
                 submitted_dt,
                 browser_key_hash,
@@ -233,6 +325,7 @@ BEGIN
                 @NewRevision,
                 @ConfigRevision,
                 @MemberCount,
+                @EntryMode,
                 @RosterHash,
                 SYSUTCDATETIME(),
                 @BROWSER_KEY_HASH,
@@ -250,6 +343,7 @@ BEGIN
                SET revision = @NewRevision,
                    meal_config_revision = @ConfigRevision,
                    submitted_member_count = @MemberCount,
+                   entry_mode = @EntryMode,
                    roster_hash = @RosterHash,
                    submitted_dt = SYSUTCDATETIME(),
                    browser_key_hash = @BROWSER_KEY_HASH,
@@ -263,22 +357,50 @@ BEGIN
         DELETE FROM dbo.meal_survey_selection
          WHERE submission_seq = @SubmissionSeq;
 
-        INSERT INTO dbo.meal_survey_selection
-        (
-            submission_seq,
-            group_member_seq,
-            meal_date,
-            meal_type,
-            ins_dt
-        )
-        SELECT @SubmissionSeq,
-               group_member_seq,
-               meal_date,
-               meal_type,
-               SYSUTCDATETIME()
-          FROM @Selection;
+        DELETE FROM dbo.meal_survey_manual_count
+         WHERE submission_seq = @SubmissionSeq;
 
-        DECLARE @SavedCount INT = @@ROWCOUNT;
+        DECLARE @SavedCount INT = 0;
+
+        IF @EntryMode = 'P'
+        BEGIN
+            INSERT INTO dbo.meal_survey_selection
+            (
+                submission_seq,
+                group_member_seq,
+                meal_date,
+                meal_type,
+                ins_dt
+            )
+            SELECT @SubmissionSeq,
+                   group_member_seq,
+                   meal_date,
+                   meal_type,
+                   SYSUTCDATETIME()
+              FROM @Selection;
+
+            SET @SavedCount = @@ROWCOUNT;
+        END
+        ELSE
+        BEGIN
+            INSERT INTO dbo.meal_survey_manual_count
+            (
+                submission_seq,
+                meal_date,
+                meal_type,
+                meal_count,
+                ins_dt
+            )
+            SELECT @SubmissionSeq,
+                   meal_date,
+                   meal_type,
+                   meal_count,
+                   SYSUTCDATETIME()
+              FROM @ManualCount;
+
+            SELECT @SavedCount = ISNULL(SUM(meal_count), 0)
+              FROM @ManualCount;
+        END;
 
         COMMIT TRANSACTION;
 

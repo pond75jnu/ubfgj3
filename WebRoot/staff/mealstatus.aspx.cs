@@ -191,12 +191,30 @@ public partial class staff_mealstatus : Page
                     .Append("'>").Append(groupName).Append("</button>");
             }
 
-            html.Append("<p>")
-                .Append("식사 선택 ")
-                .Append(Convert.ToInt32(group["selected_member_count"], CultureInfo.InvariantCulture))
-                .Append("명 / 명단 ")
-                .Append(Convert.ToInt32(group["member_count"], CultureInfo.InvariantCulture))
-                .Append("명</p></div>");
+            html.Append("<p>");
+            if (isTotal)
+            {
+                html.Append("개인 선택 ")
+                    .Append(Convert.ToInt32(group["selected_member_count"], CultureInfo.InvariantCulture))
+                    .Append("명 / 직접입력 ")
+                    .Append(Convert.ToInt32(group["manual_group_count"], CultureInfo.InvariantCulture))
+                    .Append("개 요회 / 명단 ")
+                    .Append(Convert.ToInt32(group["member_count"], CultureInfo.InvariantCulture))
+                    .Append("명");
+            }
+            else if (String.Equals(Convert.ToString(group["entry_mode"]), "M", StringComparison.Ordinal))
+            {
+                html.Append("수량 직접입력 / 명단 0명");
+            }
+            else
+            {
+                html.Append("식사 선택 ")
+                    .Append(Convert.ToInt32(group["selected_member_count"], CultureInfo.InvariantCulture))
+                    .Append("명 / 명단 ")
+                    .Append(Convert.ToInt32(group["member_count"], CultureInfo.InvariantCulture))
+                    .Append("명");
+            }
+            html.Append("</p></div>");
 
             if (isTotal)
             {
@@ -464,7 +482,7 @@ public partial class staff_mealstatus : Page
                 hdPendingConfigXml.Value = xml;
                 hdConfigRevision.Value = expectedRevision.ToString(CultureInfo.InvariantCulture);
                 pnlForceSave.Visible = true;
-                lblForceMessage.Text = "기존 식사 선택 " + affected + "건이 삭제됩니다. 계속하려면 아래 버튼을 누르세요.";
+                lblForceMessage.Text = "기존 식사 선택 또는 직접입력 수량 합계 " + affected + "건(인분)이 삭제됩니다. 계속하려면 아래 버튼을 누르세요.";
                 return;
             }
 
@@ -492,15 +510,18 @@ public partial class staff_mealstatus : Page
                 new SqlParameter("@RETREAT", _retreatCode),
                 new SqlParameter("@BELONG", belong));
 
-            if (data.Tables.Count < 4 || data.Tables[0].Rows.Count == 0)
+            if (data.Tables.Count < 5 || data.Tables[0].Rows.Count == 0)
             {
                 throw new InvalidOperationException("요회 상세 결과가 올바르지 않습니다.");
             }
 
             DataRow meta = data.Tables[0].Rows[0];
             lblDetailTitle.Text = Server.HtmlEncode(Convert.ToString(meta["belong_nm"])) + " 요회";
-            lblDetailMeta.Text = "명단 " + Convert.ToInt32(meta["member_count"], CultureInfo.InvariantCulture) + "명 · " + GetStatusText(Convert.ToString(meta["submission_status"]));
-            litDetail.Text = BuildDetailHtml(data.Tables[1], data.Tables[2], data.Tables[3]);
+            bool isManual = String.Equals(Convert.ToString(meta["entry_mode"]), "M", StringComparison.Ordinal);
+            lblDetailMeta.Text = (isManual ? "수량 직접입력 · " : String.Empty)
+                + "명단 " + Convert.ToInt32(meta["member_count"], CultureInfo.InvariantCulture) + "명 · "
+                + GetStatusText(Convert.ToString(meta["submission_status"]));
+            litDetail.Text = BuildDetailHtml(data.Tables[1], data.Tables[2], data.Tables[3], data.Tables[4]);
             pnlDetailModal.Attributes["data-meal-return-group"] = belong.ToString(CultureInfo.InvariantCulture);
             pnlDetailModal.Visible = true;
         }
@@ -510,7 +531,7 @@ public partial class staff_mealstatus : Page
         }
     }
 
-    private string BuildDetailHtml(DataTable members, DataTable schedule, DataTable selections)
+    private string BuildDetailHtml(DataTable members, DataTable schedule, DataTable selections, DataTable manualCounts)
     {
         List<string> dates = new List<string>();
         Dictionary<string, List<DataRow>> providedByDate = new Dictionary<string, List<DataRow>>(StringComparer.Ordinal);
@@ -532,6 +553,13 @@ public partial class staff_mealstatus : Page
             selected.Add(Convert.ToString(row["group_member_seq"]) + "|" + Convert.ToString(row["meal_date"]) + "|" + Convert.ToString(row["meal_type"]));
         }
 
+        Dictionary<string, int> directCounts = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (DataRow row in manualCounts.Rows)
+        {
+            directCounts[Convert.ToString(row["meal_date"]) + "|" + Convert.ToString(row["meal_type"])] =
+                Convert.ToInt32(row["meal_count"], CultureInfo.InvariantCulture);
+        }
+
         StringBuilder html = new StringBuilder();
         html.Append("<div class='site-meal-detail-scroll'><table class='site-meal-detail-table'><thead><tr><th>구성원</th>");
         foreach (string date in dates)
@@ -539,6 +567,26 @@ public partial class staff_mealstatus : Page
             html.Append("<th>").Append(Server.HtmlEncode(MealPrecheckHelper.FormatDate(date))).Append("</th>");
         }
         html.Append("</tr></thead><tbody>");
+
+        if (members.Rows.Count == 0)
+        {
+            html.Append("<tr><th scope='row'><strong>전체 대상</strong><small>수량 직접입력</small></th>");
+            foreach (string date in dates)
+            {
+                html.Append("<td><div class='site-meal-detail-cell'>");
+                foreach (DataRow meal in providedByDate[date])
+                {
+                    string type = Convert.ToString(meal["meal_type"]);
+                    string key = date + "|" + type;
+                    int count = directCounts.ContainsKey(key) ? directCounts[key] : 0;
+                    html.Append("<span class='is-selected'>")
+                        .Append(MealPrecheckHelper.GetMealName(type)).Append(" ")
+                        .Append(count.ToString(CultureInfo.InvariantCulture)).Append("명</span>");
+                }
+                html.Append("</div></td>");
+            }
+            html.Append("</tr>");
+        }
 
         foreach (DataRow member in members.Rows)
         {
@@ -566,10 +614,6 @@ public partial class staff_mealstatus : Page
         }
 
         html.Append("</tbody></table></div>");
-        if (members.Rows.Count == 0)
-        {
-            return "<div class='site-empty-state'>등록된 구성원이 없습니다.</div>";
-        }
         return html.ToString();
     }
 

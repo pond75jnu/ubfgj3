@@ -109,7 +109,7 @@ public partial class staff_mealstatus_excel_export : Page
                 new SqlParameter("@RETREAT", retreatCode),
                 new SqlParameter("@BELONG", belong));
 
-            if (detail.Tables.Count < 4 || detail.Tables[0].Rows.Count == 0)
+            if (detail.Tables.Count < 5 || detail.Tables[0].Rows.Count == 0)
             {
                 throw new InvalidOperationException(Convert.ToString(group["belong_nm"]) + " 상세 결과가 올바르지 않습니다.");
             }
@@ -171,6 +171,7 @@ public partial class staff_mealstatus_excel_export : Page
             DataRow meta = group.Detail.Tables[0].Rows[0];
             DataTable members = group.Detail.Tables[1];
             HashSet<string> selections = BuildSelectionSet(group.Detail.Tables[3]);
+            Dictionary<string, int> manualCounts = BuildManualCountMap(group.Detail.Tables[4]);
             string status = GetStatusText(Convert.ToString(meta["submission_status"]));
 
             if (members.Rows.Count == 0)
@@ -178,13 +179,17 @@ public partial class staff_mealstatus_excel_export : Page
                 DataRow emptyRow = table.NewRow();
                 emptyRow["요회"] = group.GroupName;
                 emptyRow["제출상태"] = status;
-                emptyRow["성명"] = "(구성원 없음)";
-                emptyRow["회원구분"] = String.Empty;
+                emptyRow["성명"] = "전체 대상";
+                emptyRow["회원구분"] = "수량 직접입력";
+                int manualTotal = 0;
                 foreach (MealColumn meal in mealColumns)
                 {
-                    emptyRow[meal.Header] = 0;
+                    string key = meal.MealDate + "|" + meal.MealType;
+                    int count = manualCounts.ContainsKey(key) ? manualCounts[key] : 0;
+                    emptyRow[meal.Header] = count;
+                    manualTotal += count;
                 }
-                emptyRow["선택합계"] = 0;
+                emptyRow["선택합계"] = manualTotal;
                 table.Rows.Add(emptyRow);
                 continue;
             }
@@ -229,6 +234,20 @@ public partial class staff_mealstatus_excel_export : Page
                 + Convert.ToString(selection["meal_type"], CultureInfo.InvariantCulture));
         }
         return selections;
+    }
+
+    private static Dictionary<string, int> BuildManualCountMap(DataTable countTable)
+    {
+        Dictionary<string, int> counts = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (DataRow count in countTable.Rows)
+        {
+            counts[
+                Convert.ToString(count["meal_date"], CultureInfo.InvariantCulture)
+                + "|"
+                + Convert.ToString(count["meal_type"], CultureInfo.InvariantCulture)] =
+                Convert.ToInt32(count["meal_count"], CultureInfo.InvariantCulture);
+        }
+        return counts;
     }
 
     private static string GetStatusText(string status)

@@ -19,6 +19,13 @@ public sealed class MealSelectionItem
     public string MealType { get; set; }
 }
 
+public sealed class MealManualCountItem
+{
+    public string MealDate { get; set; }
+    public string MealType { get; set; }
+    public int MealCount { get; set; }
+}
+
 public static class MealPrecheckHelper
 {
     private const string DateFormat = "yyyyMMdd";
@@ -183,6 +190,39 @@ public static class MealPrecheckHelper
                 writer.WriteAttributeString("member", selection.GroupMemberSeq.ToString(CultureInfo.InvariantCulture));
                 writer.WriteAttributeString("date", selection.MealDate);
                 writer.WriteAttributeString("type", selection.MealType);
+                writer.WriteEndElement();
+            }
+            writer.WriteEndElement();
+        }
+
+        return builder.ToString();
+    }
+
+    public static string BuildManualCountXml(IEnumerable<MealManualCountItem> counts)
+    {
+        StringBuilder builder = new StringBuilder();
+        XmlWriterSettings settings = new XmlWriterSettings
+        {
+            OmitXmlDeclaration = true,
+            ConformanceLevel = ConformanceLevel.Document
+        };
+
+        using (XmlWriter writer = XmlWriter.Create(new StringWriter(builder, CultureInfo.InvariantCulture), settings))
+        {
+            writer.WriteStartElement("counts");
+            foreach (MealManualCountItem count in counts)
+            {
+                ParseDate(count.MealDate, "식사일");
+                ValidateMealType(count.MealType);
+                if (count.MealCount < 0 || count.MealCount > 9999)
+                {
+                    throw new InvalidOperationException("식사 수량은 0명부터 9,999명까지 입력할 수 있습니다.");
+                }
+
+                writer.WriteStartElement("item");
+                writer.WriteAttributeString("date", count.MealDate);
+                writer.WriteAttributeString("type", count.MealType);
+                writer.WriteAttributeString("count", count.MealCount.ToString(CultureInfo.InvariantCulture));
                 writer.WriteEndElement();
             }
             writer.WriteEndElement();

@@ -72,6 +72,7 @@ BEGIN
         member_count INT NOT NULL DEFAULT (0),
         roster_hash CHAR(64) NULL,
         selected_member_count INT NOT NULL DEFAULT (0),
+        entry_mode CHAR(1) NOT NULL DEFAULT ('P'),
         submission_status NVARCHAR(30) NOT NULL DEFAULT (N'NOT_SUBMITTED'),
         submitted_dt DATETIME2(0) NULL,
         submission_revision INT NOT NULL DEFAULT (0)
@@ -101,6 +102,7 @@ BEGIN
     UPDATE I
        SET submitted_dt = H.submitted_dt,
            submission_revision = ISNULL(H.revision, 0),
+           entry_mode = ISNULL(H.entry_mode, 'P'),
            submission_status =
                CASE WHEN H.seq IS NULL THEN N'NOT_SUBMITTED'
                     WHEN H.roster_hash <> I.roster_hash
@@ -126,6 +128,7 @@ BEGIN
             AND E.provide_yn = 'Y'
           WHERE H.retreat = @RETREAT
             AND H.belong = I.belong
+            AND H.entry_mode = 'P'
      ) X;
 
     DECLARE @GroupCount INT = (SELECT COUNT(*) FROM @GroupInfo);
@@ -141,6 +144,8 @@ BEGIN
            R.belong_nm,
            R.member_count,
            R.selected_member_count,
+           R.entry_mode,
+           R.manual_group_count,
            R.submission_status,
            R.submitted_dt,
            R.submission_revision,
@@ -153,6 +158,8 @@ BEGIN
                  N'전체' AS belong_nm,
                  ISNULL(SUM(member_count), 0) AS member_count,
                  ISNULL(SUM(selected_member_count), 0) AS selected_member_count,
+                 'T' AS entry_mode,
+                 ISNULL(SUM(CASE WHEN entry_mode = 'M' AND submission_status <> N'NOT_SUBMITTED' THEN 1 ELSE 0 END), 0) AS manual_group_count,
                  N'SUMMARY' AS submission_status,
                  CAST(NULL AS DATETIME2(0)) AS submitted_dt,
                  0 AS submission_revision,
@@ -165,6 +172,8 @@ BEGIN
                  belong_nm,
                  member_count,
                  selected_member_count,
+                 entry_mode,
+                 CASE WHEN entry_mode = 'M' AND submission_status <> N'NOT_SUBMITTED' THEN 1 ELSE 0 END,
                  submission_status,
                  submitted_dt,
                  submission_revision,
@@ -201,18 +210,40 @@ BEGIN
            E.provide_yn,
            CASE WHEN E.provide_yn = 'N' THEN NULL
                 ELSE
+                ISNULL
                 (
-                    SELECT COUNT(DISTINCT S.group_member_seq)
-                      FROM dbo.meal_survey_submission H
-                     INNER JOIN dbo.meal_survey_selection S ON S.submission_seq = H.seq
-                     INNER JOIN dbo.groups G
-                        ON G.seq = H.belong
-                       AND G.retreat = H.retreat
-                       AND ISNULL(G.etc1, N'N') = N'Y'
-                     WHERE H.retreat = @RETREAT
-                       AND (T.is_total = 1 OR H.belong = T.belong)
-                       AND S.meal_date = E.meal_date
-                       AND S.meal_type = E.meal_type
+                    (
+                        SELECT COUNT(DISTINCT S.group_member_seq)
+                          FROM dbo.meal_survey_submission H
+                         INNER JOIN dbo.meal_survey_selection S ON S.submission_seq = H.seq
+                         INNER JOIN dbo.groups G
+                            ON G.seq = H.belong
+                           AND G.retreat = H.retreat
+                           AND ISNULL(G.etc1, N'N') = N'Y'
+                         WHERE H.retreat = @RETREAT
+                           AND H.entry_mode = 'P'
+                           AND (T.is_total = 1 OR H.belong = T.belong)
+                           AND S.meal_date = E.meal_date
+                           AND S.meal_type = E.meal_type
+                    ),
+                    0
+                )
+                + ISNULL
+                (
+                    (
+                        SELECT SUM(C.meal_count)
+                          FROM dbo.meal_survey_submission H
+                         INNER JOIN dbo.meal_survey_manual_count C ON C.submission_seq = H.seq
+                         INNER JOIN @GroupInfo I
+                            ON I.belong = H.belong
+                           AND I.member_count = 0
+                         WHERE H.retreat = @RETREAT
+                           AND H.entry_mode = 'M'
+                           AND (T.is_total = 1 OR H.belong = T.belong)
+                           AND C.meal_date = E.meal_date
+                           AND C.meal_type = E.meal_type
+                    ),
+                    0
                 )
            END AS meal_count
       FROM @Targets T

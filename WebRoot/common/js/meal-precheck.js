@@ -44,15 +44,44 @@
         return Array.prototype.slice.call(document.querySelectorAll("[data-meal-survey-checkbox]"));
     }
 
+    function manualCountList() {
+        return Array.prototype.slice.call(document.querySelectorAll("[data-meal-manual-count]"));
+    }
+
     function updateSelectionCount() {
         var output = document.querySelector("[data-meal-selection-count]");
         if (!output) {
             return;
         }
 
+        var manualInputs = manualCountList();
+        var label = document.querySelector("[data-meal-selection-label]");
+        var unit = document.querySelector("[data-meal-selection-unit]");
+
+        if (manualInputs.length > 0) {
+            var total = manualInputs.reduce(function (sum, input) {
+                var value = /^\d+$/.test(input.value) ? parseInt(input.value, 10) : 0;
+                return sum + value;
+            }, 0);
+            output.textContent = total.toLocaleString("ko-KR");
+            if (label) {
+                label.textContent = "입력한 총 식사";
+            }
+            if (unit) {
+                unit.textContent = "인분";
+            }
+            return;
+        }
+
         output.textContent = checkboxList().filter(function (checkbox) {
             return checkbox.checked;
         }).length.toLocaleString("ko-KR");
+        if (label) {
+            label.textContent = "선택한 식사";
+        }
+        if (unit) {
+            unit.textContent = "건";
+        }
     }
 
     function updateMemberToggle(toggle) {
@@ -79,6 +108,27 @@
 
     window.mealPrecheckConfirmEmptySelection = function () {
         saving = true;
+        var manualInputs = manualCountList();
+        if (manualInputs.length > 0) {
+            var total = 0;
+            for (var index = 0; index < manualInputs.length; index += 1) {
+                var input = manualInputs[index];
+                if (!/^\d{1,4}$/.test(input.value) || parseInt(input.value, 10) > 9999) {
+                    saving = false;
+                    showErrorModal("각 식사 수량은 0부터 9,999까지의 숫자로 입력하세요.", input);
+                    return false;
+                }
+                total += parseInt(input.value, 10);
+            }
+
+            if (total > 0 || window.confirm("입력한 식사 수량이 모두 0명입니다. 그대로 저장할까요?")) {
+                return true;
+            }
+
+            saving = false;
+            return false;
+        }
+
         var hasSelection = checkboxList().some(function (checkbox) {
             return checkbox.checked;
         });
@@ -99,7 +149,7 @@
             return false;
         }
 
-        if (dirty && !window.confirm("저장하지 않은 식사 선택이 있습니다. 신규인원을 추가하면 현재 변경사항은 사라집니다. 계속할까요?")) {
+        if (dirty && !window.confirm("저장하지 않은 식사 입력이 있습니다. 신규인원을 추가하면 현재 변경사항은 사라집니다. 계속할까요?")) {
             return false;
         }
 
@@ -108,6 +158,22 @@
     };
 
     function initializeSurvey() {
+        manualCountList().forEach(function (input) {
+            input.addEventListener("focus", function () {
+                if (input.value === "0") {
+                    input.select();
+                }
+            });
+            input.addEventListener("input", function () {
+                var digits = input.value.replace(/[^0-9]/g, "").slice(0, 4);
+                if (input.value !== digits) {
+                    input.value = digits;
+                }
+                dirty = true;
+                updateSelectionCount();
+            });
+        });
+
         checkboxList().forEach(function (checkbox) {
             checkbox.addEventListener("change", function () {
                 dirty = true;

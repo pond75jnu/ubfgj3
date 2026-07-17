@@ -192,11 +192,26 @@ BEGIN
            AND N.meal_type = S.meal_type
            AND N.provide_yn = 'N';
 
+        SELECT @AffectedCount = ISNULL(@AffectedCount, 0) + ISNULL(SUM(C.meal_count), 0)
+          FROM dbo.meal_survey_manual_count C
+         INNER JOIN dbo.meal_survey_submission H
+            ON H.seq = C.submission_seq
+           AND H.retreat = @RETREAT
+           AND H.entry_mode = 'M'
+         INNER JOIN @Current O
+            ON O.meal_date = C.meal_date
+           AND O.meal_type = C.meal_type
+           AND O.provide_yn = 'Y'
+         INNER JOIN @Config N
+            ON N.meal_date = C.meal_date
+           AND N.meal_type = C.meal_type
+           AND N.provide_yn = 'N';
+
         IF ISNULL(@AffectedCount, 0) > 0 AND @FORCE = 'N'
         BEGIN
             COMMIT TRANSACTION;
             SELECT N'CONFIRM_REQUIRED' AS result_code,
-                   N'제공하지 않는 식사로 변경하면 기존 선택이 삭제됩니다.' AS result_message,
+                   N'제공하지 않는 식사로 변경하면 기존 선택 또는 직접입력 수량이 삭제됩니다.' AS result_message,
                    @CurrentRevision AS config_revision,
                    @AffectedCount AS affected_count;
             RETURN;
@@ -259,6 +274,14 @@ BEGIN
          WHERE S.meal_date < CONVERT(CHAR(8), @StartDate, 112)
             OR S.meal_date > CONVERT(CHAR(8), @EndDate, 112);
 
+        DELETE C
+          FROM dbo.meal_survey_manual_count C
+         INNER JOIN dbo.meal_survey_submission H
+            ON H.seq = C.submission_seq
+           AND H.retreat = @RETREAT
+         WHERE C.meal_date < CONVERT(CHAR(8), @StartDate, 112)
+            OR C.meal_date > CONVERT(CHAR(8), @EndDate, 112);
+
         IF @FORCE = 'Y'
         BEGIN
             DELETE S
@@ -270,6 +293,16 @@ BEGIN
                 ON C.meal_date = S.meal_date
                AND C.meal_type = S.meal_type
                AND C.provide_yn = 'N';
+
+            DELETE C
+              FROM dbo.meal_survey_manual_count C
+             INNER JOIN dbo.meal_survey_submission H
+                ON H.seq = C.submission_seq
+               AND H.retreat = @RETREAT
+             INNER JOIN @Config N
+                ON N.meal_date = C.meal_date
+               AND N.meal_type = C.meal_type
+               AND N.provide_yn = 'N';
         END;
 
         COMMIT TRANSACTION;

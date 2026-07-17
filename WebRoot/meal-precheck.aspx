@@ -2,8 +2,8 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <meta name="robots" content="noindex,nofollow" />
-    <link rel="stylesheet" href="/common/css/meal-precheck.css?v=meal-precheck-07" />
-    <script defer src="/common/js/meal-precheck.js?v=meal-precheck-07"></script>
+    <link rel="stylesheet" href="/common/css/meal-precheck.css?v=meal-precheck-08" />
+    <script defer src="/common/js/meal-precheck.js?v=meal-precheck-08"></script>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
@@ -49,7 +49,8 @@
                 </div>
                 <div class="site-meal-survey-meta-actions">
                     <div class="site-meal-selection-count" aria-live="polite">
-                        선택한 식사 <strong data-meal-selection-count>0</strong>건
+                        <span data-meal-selection-label>선택한 식사</span>
+                        <strong data-meal-selection-count>0</strong><span data-meal-selection-unit>건</span>
                     </div>
                 </div>
             </div>
