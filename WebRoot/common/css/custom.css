@@ -570,6 +570,10 @@ img {
     padding: 12px 18px;
 }
 
+.site-program-actions-single {
+    justify-content: center;
+}
+
 .site-program-dialog.ui-draggable-dragging .site-program-frame,
 .site-program-dialog.ui-resizable-resizing .site-program-frame {
     pointer-events: none;
@@ -3405,8 +3409,18 @@ textarea.ui-input {
         padding: 10px 12px;
     }
 
+    .site-program-actions-single {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
     .site-program-actions .site-button {
         width: 100%;
+    }
+
+    .site-program-actions-single .site-button {
+        width: 160px;
+        max-width: 100%;
     }
 
     .site-global-nav {

@@ -21,7 +21,7 @@
 - `migration_plan.md`의 방향대로 Bootstrap 기반 공통 레이아웃을 Tailwind 기반 구조로 전환했다.
 - `WebRoot/master/master_main.master`에서 Bootstrap CSS/JS와 Bootstrap Icons 의존 로드를 제거했다.
 - Tailwind CDN 런타임은 사용하지 않고, `DESIGN.md` 기준 토큰으로 생성한 로컬 CSS `WebRoot/common/css/tailwind.css`를 로드한다.
-- 현재 공통 CSS/JS 캐시 버전은 `tailwind.css?v=tailwind-02`, `custom.css?v=tailwind-48`, `custom.js?v=tailwind-23`이다.
+- 현재 공통 CSS/JS 캐시 버전은 `tailwind.css?v=tailwind-02`, `custom.css?v=tailwind-51`, `custom.js?v=tailwind-24`이다.
 - Pretendard GOV 고정(static) dynamic subset 웹폰트를 사용한다.
 - `custom.css`는 `DESIGN.md`의 Action Blue, hairline border, neutral background, restrained radius 원칙을 기준으로 공통 화면을 보정한다.
 - Web Forms 기존 화면에 남아 있는 `btn`, `form-control`, `form-select`, `table`, `card`, `badge`, `alert` 계열 클래스는 공통 CSS에서 호환 스타일로 흡수한다.
@@ -725,7 +725,7 @@ SP 소스는 `DB/StoredProcedure` 아래에 관리한다. 개별 SP 파일은 `C
 - 운영 반영 시 운영 `appsettings.json`을 별도 보관한 뒤 로컬 실제 설정 파일의 `MealPrecheck` 블록만 병합한다. 구조 예시인 `appsettings.json.local`을 운영에 올리거나 운영 DB/SMTP 값이 있는 파일 전체를 덮어쓰지 않는다.
 - `MealPrecheck`가 없거나 hash/salt/HMAC/제한값 검증에 실패하면 `/meal-precheck` 첫 화면에 `식사 조사 설정을 확인할 수 없습니다. 관리자에게 문의하세요.`가 표시된다. 이 오류는 DB 조회 전 보안 초기화 단계에서 발생한다.
 - `AppConfiguration`은 설정을 정적 캐시하므로 운영 `appsettings.json`을 수정한 뒤 앱 풀을 재활용한다. 앱 풀 제어가 불가능한 FTP 환경에서는 `Web.config`를 다시 배포해 AppDomain을 재시작할 수 있다.
-- Home 버튼 공통 CSS는 `master/master_main.master`에서 `/common/css/custom.css?v=tailwind-49`로 로드한다. CSS 변경 후에는 query version을 올려 브라우저 캐시를 무효화한다.
+- Home 버튼 공통 CSS는 `master/master_main.master`에서 `/common/css/custom.css?v=tailwind-51`로 로드한다. CSS 변경 후에는 query version을 올려 브라우저 캐시를 무효화한다.
 - `수양회 식사여부 사전조사` 버튼은 `site-home-button-secondary`의 반투명 배경과 `backdrop-filter`를 사용하므로 같은 CSS라도 배경 이미지 위치, 화면 너비, 브라우저 렌더링에 따라 색이 다르게 보일 수 있다.
 
 ### 식사 조사 검증

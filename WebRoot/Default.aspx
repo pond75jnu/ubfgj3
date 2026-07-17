@@ -44,8 +44,7 @@
             <div class="site-program-body">
                 <iframe class="site-program-frame" title="수양회 프로그램 문서 뷰어" data-retreat-program-frame></iframe>
             </div>
-            <footer class="site-program-actions">
-                <a class="site-button site-button-secondary" href="/retreat_program_viewer" target="_blank" rel="noopener">새 탭으로 열기</a>
+            <footer class="site-program-actions site-program-actions-single">
                 <button type="button" class="site-button site-button-primary" data-retreat-program-close>닫기</button>
             </footer>
         </section>
