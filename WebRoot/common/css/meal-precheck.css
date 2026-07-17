@@ -330,6 +330,14 @@
     padding: 20px;
 }
 
+.site-meal-modal[hidden] {
+    display: none;
+}
+
+.site-meal-error-modal {
+    z-index: 10020;
+}
+
 .site-meal-modal-backdrop {
     position: absolute;
     border: 0;
@@ -400,6 +408,51 @@
     min-height: 0;
     overflow: auto;
     padding: 18px;
+}
+
+.site-meal-error-dialog {
+    width: min(480px, 100%);
+}
+
+.site-meal-error-header {
+    border-bottom-color: #fee2e2;
+}
+
+.site-meal-error-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    padding-top: 22px;
+    padding-bottom: 22px;
+}
+
+.site-meal-error-icon {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.site-meal-error-message {
+    margin: 4px 0 0;
+    color: #7f1d1d;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+.site-meal-excel-button[aria-busy="true"] {
+    cursor: wait;
+    opacity: 0.72;
+    pointer-events: none;
 }
 
 body.site-meal-modal-open {

@@ -2,8 +2,8 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <meta name="robots" content="noindex,nofollow" />
-    <link rel="stylesheet" href="/common/css/meal-precheck.css?v=meal-precheck-05" />
-    <script defer src="/common/js/meal-precheck.js?v=meal-precheck-05"></script>
+    <link rel="stylesheet" href="/common/css/meal-precheck.css?v=meal-precheck-07" />
+    <script defer src="/common/js/meal-precheck.js?v=meal-precheck-07"></script>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
@@ -107,6 +107,26 @@
             <footer class="site-meal-modal-footer">
                 <button type="button" class="site-button site-button-secondary" data-meal-add-member-close>취소</button>
                 <asp:Button ID="btnAddMember" runat="server" CssClass="site-button site-button-primary" Text="확인" OnClientClick="return mealPrecheckValidateNewMember();" OnClick="btnAddMember_Click" data-meal-add-member-submit="true" />
+            </footer>
+        </section>
+    </asp:Panel>
+
+    <asp:Panel ID="pnlErrorModal" runat="server" CssClass="site-meal-modal site-meal-error-modal" role="alertdialog" aria-modal="true" aria-labelledby="mealPublicErrorTitle" aria-describedby="mealPublicErrorMessage" data-meal-error-modal hidden="hidden">
+        <button type="button" class="site-meal-modal-backdrop" aria-label="오류 안내 창 닫기" data-meal-error-close></button>
+        <section class="site-meal-modal-dialog site-meal-error-dialog" data-meal-error-dialog>
+            <header class="site-meal-modal-header site-meal-error-header">
+                <div>
+                    <p class="site-meal-modal-kicker">처리 오류</p>
+                    <h2 id="mealPublicErrorTitle">확인이 필요합니다</h2>
+                </div>
+                <button type="button" class="site-meal-modal-close" aria-label="닫기" data-meal-error-close>&times;</button>
+            </header>
+            <div class="site-meal-modal-body site-meal-error-body">
+                <span class="site-meal-error-icon" aria-hidden="true">!</span>
+                <p id="mealPublicErrorMessage" class="site-meal-error-message" data-meal-error-message><asp:Label ID="lblErrorModalMessage" runat="server" /></p>
+            </div>
+            <footer class="site-meal-modal-footer">
+                <button type="button" class="site-button site-button-primary" data-meal-error-close>확인</button>
             </footer>
         </section>
     </asp:Panel>

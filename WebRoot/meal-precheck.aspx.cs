@@ -77,16 +77,11 @@ public partial class meal_precheck : Page
             BindSurvey();
             if (String.Equals(Request.QueryString["saved"], "1", StringComparison.Ordinal))
             {
-                ShowMessage("식사 여부를 저장했습니다.", false);
                 ClientScript.RegisterStartupScript(
                     GetType(),
                     "MealPrecheckSavedAlert",
                     "window.alert('저장되었습니다.');",
                     true);
-            }
-            else if (String.Equals(Request.QueryString["added"], "1", StringComparison.Ordinal))
-            {
-                ShowMessage("신규인원을 추가했습니다. 식사 여부를 선택한 후 저장하세요.", false);
             }
         }
         else if (_isGroupLocked && !ApplyLockedGroupSelection())
@@ -124,6 +119,7 @@ public partial class meal_precheck : Page
                 else
                 {
                     lblAccessState.Text = "암호가 올바르지 않습니다. 남은 시도: " + guard.RemainingAttempts + "회";
+                    ShowMessage(lblAccessState.Text, true);
                 }
                 txtAccessPassword.Text = String.Empty;
                 return;
@@ -453,6 +449,7 @@ public partial class meal_precheck : Page
         {
             lblAccessState.Text = "현재 재시도할 수 없습니다. 잠시 후 다시 시도하세요.";
         }
+        ShowMessage(lblAccessState.Text, true);
     }
 
     private bool LoadActiveRetreat()
@@ -756,8 +753,16 @@ public partial class meal_precheck : Page
 
     private void ShowMessage(string message, bool isError)
     {
+        if (isError)
+        {
+            pnlMessage.Visible = false;
+            pnlErrorModal.Attributes.Remove("hidden");
+            lblErrorModalMessage.Text = message;
+            return;
+        }
+
         pnlMessage.Visible = true;
-        pnlMessage.CssClass = isError ? "site-alert site-alert-danger" : "site-alert site-alert-success";
+        pnlMessage.CssClass = "site-alert site-alert-success";
         lblMessage.Text = message;
     }
 }

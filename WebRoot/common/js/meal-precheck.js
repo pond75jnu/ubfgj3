@@ -3,6 +3,42 @@
 
     var dirty = false;
     var saving = false;
+    var errorModalReturnFocus = null;
+
+    function isModalOpen(modal) {
+        return modal
+            && !modal.hasAttribute("hidden")
+            && modal.style.display !== "none"
+            && modal.getAttribute("aria-hidden") !== "true";
+    }
+
+    function syncBodyModalState() {
+        var hasOpenModal = Array.prototype.some.call(document.querySelectorAll(".site-meal-modal"), isModalOpen);
+        document.body.classList.toggle("site-meal-modal-open", hasOpenModal);
+    }
+
+    function showErrorModal(message, returnFocus) {
+        var modal = document.querySelector("[data-meal-error-modal]");
+        if (!modal) {
+            return;
+        }
+
+        var output = modal.querySelector("[data-meal-error-message]");
+        if (output) {
+            output.textContent = message || "요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+        }
+        errorModalReturnFocus = returnFocus || document.activeElement;
+        modal.removeAttribute("hidden");
+        modal.setAttribute("aria-hidden", "false");
+        syncBodyModalState();
+
+        var firstControl = modal.querySelector("[data-meal-error-close]");
+        if (firstControl) {
+            window.setTimeout(function () { firstControl.focus(); }, 0);
+        }
+    }
+
+    window.mealPrecheckShowError = showErrorModal;
 
     function checkboxList() {
         return Array.prototype.slice.call(document.querySelectorAll("[data-meal-survey-checkbox]"));
@@ -59,10 +95,7 @@
         var modal = document.querySelector("[data-meal-add-member-modal]");
         var nameInput = modal ? modal.querySelector("input[type='text']") : null;
         if (!nameInput || !nameInput.value.trim()) {
-            window.alert("성명을 입력하세요.");
-            if (nameInput) {
-                nameInput.focus();
-            }
+            showErrorModal("성명을 입력하세요.", nameInput);
             return false;
         }
 
@@ -268,6 +301,159 @@
         }
     }
 
+    function initializeErrorModal() {
+        var modal = document.querySelector("[data-meal-error-modal]");
+        if (!modal) {
+            return;
+        }
+
+        var dialog = modal.querySelector("[data-meal-error-dialog]");
+        var closeButtons = modal.querySelectorAll("[data-meal-error-close]");
+        var focusableSelector = "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
+
+        function closeModal() {
+            modal.setAttribute("hidden", "hidden");
+            modal.setAttribute("aria-hidden", "true");
+            syncBodyModalState();
+            if (errorModalReturnFocus && document.documentElement.contains(errorModalReturnFocus)) {
+                window.setTimeout(function () { errorModalReturnFocus.focus(); }, 0);
+            }
+        }
+
+        Array.prototype.slice.call(closeButtons).forEach(function (button) {
+            button.addEventListener("click", closeModal);
+        });
+
+        modal.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                closeModal();
+                return;
+            }
+            if (event.key !== "Tab" || !dialog) {
+                return;
+            }
+
+            var focusable = Array.prototype.slice.call(dialog.querySelectorAll(focusableSelector));
+            if (!focusable.length) {
+                return;
+            }
+            var first = focusable[0];
+            var last = focusable[focusable.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        });
+
+        if (isModalOpen(modal)) {
+            var addMemberModal = document.querySelector("[data-meal-add-member-modal]");
+            var addMemberControl = isModalOpen(addMemberModal)
+                ? addMemberModal.querySelector("input:not([disabled]), select:not([disabled]), button:not([disabled])")
+                : null;
+            errorModalReturnFocus = addMemberControl || document.activeElement;
+            syncBodyModalState();
+            var firstControl = dialog ? dialog.querySelector(focusableSelector) : null;
+            if (firstControl) {
+                window.setTimeout(function () { firstControl.focus(); }, 0);
+            }
+        }
+    }
+
+    function readExcelError(response) {
+        return response.text().then(function (text) {
+            try {
+                var data = JSON.parse(text);
+                if (data && data.message) {
+                    return data.message;
+                }
+            } catch (ignore) {
+                // 로그인 페이지 등 JSON이 아닌 응답은 아래 공통 문구를 사용한다.
+            }
+            return response.status === 403
+                ? "엑셀 다운로드 권한을 확인할 수 없습니다. 다시 로그인해 주세요."
+                : "식사 선택 상세 엑셀을 생성하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+        });
+    }
+
+    function getExcelFileName(response) {
+        var disposition = response.headers.get("content-disposition") || "";
+        var match = disposition.match(/filename=([^;]+)/i);
+        if (!match) {
+            return "식사선택상세.xlsx";
+        }
+
+        var encoded = match[1].trim().replace(/^['\"]|['\"]$/g, "");
+        try {
+            return decodeURIComponent(encoded.replace(/\+/g, "%20"));
+        } catch (ignore) {
+            return "식사선택상세.xlsx";
+        }
+    }
+
+    function downloadExcelBlob(blob, fileName) {
+        var objectUrl = window.URL.createObjectURL(blob);
+        var anchor = document.createElement("a");
+        anchor.href = objectUrl;
+        anchor.download = fileName;
+        anchor.style.display = "none";
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+        window.setTimeout(function () { window.URL.revokeObjectURL(objectUrl); }, 1000);
+    }
+
+    function initializeExcelDownload() {
+        if (!window.fetch || !window.URL || !window.URL.createObjectURL) {
+            return;
+        }
+
+        Array.prototype.slice.call(document.querySelectorAll("[data-meal-excel-download]")).forEach(function (link) {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+                if (link.getAttribute("aria-busy") === "true") {
+                    return;
+                }
+
+                var originalText = link.textContent;
+                link.setAttribute("aria-busy", "true");
+                link.setAttribute("aria-disabled", "true");
+                link.textContent = "엑셀 생성 중...";
+
+                window.fetch(link.href, {
+                    method: "GET",
+                    credentials: "same-origin",
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                }).then(function (response) {
+                    var contentType = response.headers.get("content-type") || "";
+                    if (!response.ok || contentType.indexOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") < 0) {
+                        return readExcelError(response).then(function (message) {
+                            throw new Error(message);
+                        });
+                    }
+
+                    var fileName = getExcelFileName(response);
+                    return response.blob().then(function (blob) {
+                        downloadExcelBlob(blob, fileName);
+                    });
+                }).then(function () {
+                    link.removeAttribute("aria-busy");
+                    link.removeAttribute("aria-disabled");
+                    link.textContent = originalText;
+                }, function (error) {
+                    link.removeAttribute("aria-busy");
+                    link.removeAttribute("aria-disabled");
+                    link.textContent = originalText;
+                    showErrorModal(error && error.message
+                        ? error.message
+                        : "식사 선택 상세 엑셀을 생성하지 못했습니다. 잠시 후 다시 시도해 주세요.", link);
+                });
+            });
+        });
+    }
+
     function scrollToNewMember() {
         var member = document.querySelector("[data-meal-new-member]");
         if (!member) {
@@ -295,12 +481,16 @@
             initializeSurvey();
             initializeModal();
             initializeAddMemberModal();
+            initializeErrorModal();
+            initializeExcelDownload();
             scrollToNewMember();
         });
     } else {
         initializeSurvey();
         initializeModal();
         initializeAddMemberModal();
+        initializeErrorModal();
+        initializeExcelDownload();
         scrollToNewMember();
     }
 }());

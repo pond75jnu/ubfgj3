@@ -582,8 +582,16 @@ public partial class staff_mealstatus : Page
 
     private void ShowMessage(string message, bool isError)
     {
+        if (isError)
+        {
+            pnlMessage.Visible = false;
+            pnlErrorModal.Attributes.Remove("hidden");
+            lblErrorModalMessage.Text = message;
+            return;
+        }
+
         pnlMessage.Visible = true;
-        pnlMessage.CssClass = isError ? "site-alert site-alert-danger" : "site-alert site-alert-success";
+        pnlMessage.CssClass = "site-alert site-alert-success";
         lblMessage.Text = message;
     }
 }

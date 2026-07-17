@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Web;
+using System.Web.Script.Serialization;
 using System.Web.UI;
 
 public partial class staff_mealstatus_excel_export : Page
@@ -27,6 +28,12 @@ public partial class staff_mealstatus_excel_export : Page
     {
         if (!CanManageMeals())
         {
+            if (IsAjaxRequest())
+            {
+                WriteError("엑셀 다운로드 권한을 확인할 수 없습니다. 다시 로그인해 주세요.", 403);
+                return;
+            }
+
             Response.Redirect("/", false);
             Context.ApplicationInstance.CompleteRequest();
             return;
@@ -47,7 +54,8 @@ public partial class staff_mealstatus_excel_export : Page
         }
         catch (Exception ex)
         {
-            WriteError("식사 선택 상세 엑셀을 생성하지 못했습니다. " + ex.Message);
+            Trace.Warn("MealStatusExcel", "식사 선택 상세 엑셀 생성 오류", ex);
+            WriteError("식사 선택 상세 엑셀을 생성하지 못했습니다. 잠시 후 다시 시도해 주세요.", 500);
         }
     }
 
@@ -246,15 +254,19 @@ public partial class staff_mealstatus_excel_export : Page
         return result;
     }
 
-    private void WriteError(string message)
+    private bool IsAjaxRequest()
+    {
+        return String.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void WriteError(string message, int statusCode)
     {
         Response.Clear();
-        Response.StatusCode = 500;
+        Response.StatusCode = statusCode;
+        Response.SuppressFormsAuthenticationRedirect = true;
         Response.TrySkipIisCustomErrors = true;
-        Response.ContentType = "text/html; charset=utf-8";
-        Response.Write("<!doctype html><html lang='ko'><head><meta charset='utf-8'><title>엑셀 다운로드 오류</title></head><body>");
-        Response.Write("<p>" + HttpUtility.HtmlEncode(message) + "</p>");
-        Response.Write("<p><a href='/staff/mealstatus'>식사수량 현황으로 돌아가기</a></p></body></html>");
+        Response.ContentType = "application/json; charset=utf-8";
+        Response.Write(new JavaScriptSerializer().Serialize(new { message = message }));
         Context.ApplicationInstance.CompleteRequest();
     }
 }
