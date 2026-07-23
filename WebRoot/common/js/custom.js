@@ -167,10 +167,26 @@ document.addEventListener("DOMContentLoaded", function () {
     var openLinks = document.querySelectorAll("[data-retreat-program-open]");
     var closeButtons = modal.querySelectorAll("[data-retreat-program-close]");
     var dialog = modal.querySelector("[data-retreat-program-dialog]");
+    var dialogHeader = modal.querySelector(".site-program-header");
     var frame = modal.querySelector("[data-retreat-program-frame]");
     var closeButton = modal.querySelector(".site-program-close");
     var lastActiveElement = null;
     var desktopModalQuery = window.matchMedia("(min-width: 834px)");
+
+    function setDialogMaximized(maximized) {
+        if (!dialog) {
+            return;
+        }
+
+        dialog.classList.toggle("is-maximized", maximized);
+
+        if (dialogHeader) {
+            dialogHeader.setAttribute(
+                "title",
+                maximized ? "더블클릭하여 이전 크기로 복원" : "더블클릭하여 화면에 꽉 채우기"
+            );
+        }
+    }
 
     function setDialogToolsEnabled(enabled) {
         if (!window.jQuery || !dialog) {
@@ -212,6 +228,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 cancel: ".site-program-close, .site-program-actions, a, button, iframe",
                 containment: "window",
                 start: function () {
+                    if (dialog.classList.contains("is-maximized")) {
+                        return false;
+                    }
+
                     dialog.classList.add("ui-draggable-dragging");
                 },
                 stop: function () {
@@ -224,6 +244,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 minWidth: 420,
                 minHeight: 360,
                 start: function () {
+                    if (dialog.classList.contains("is-maximized")) {
+                        return false;
+                    }
+
                     $dialog.resizable("option", "maxWidth", Math.max(420, window.innerWidth - 24));
                     $dialog.resizable("option", "maxHeight", Math.max(360, window.innerHeight - 24));
                     dialog.classList.add("ui-resizable-resizing");
@@ -258,6 +282,7 @@ document.addEventListener("DOMContentLoaded", function () {
         modal.style.display = "flex";
         modal.classList.add("is-open");
         document.body.classList.add("site-modal-open");
+        setDialogMaximized(false);
         initDialogTools();
 
         if (closeButton) {
@@ -266,6 +291,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function closeModal() {
+        setDialogMaximized(false);
         modal.classList.remove("is-open");
         modal.style.display = "none";
         document.body.classList.remove("site-modal-open");
@@ -291,6 +317,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    if (dialogHeader) {
+        setDialogMaximized(false);
+        dialogHeader.addEventListener("dblclick", function (event) {
+            if (!desktopModalQuery.matches || event.target.closest("button, a")) {
+                return;
+            }
+
+            event.preventDefault();
+            setDialogMaximized(!dialog.classList.contains("is-maximized"));
+        });
+    }
+
     document.addEventListener("keydown", function (event) {
         if (event.key === "Escape" && modal.classList.contains("is-open")) {
             closeModal();
@@ -301,6 +339,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (desktopModalQuery.matches) {
             setDialogToolsEnabled(true);
         } else {
+            setDialogMaximized(false);
             setDialogToolsEnabled(false);
             resetDialogForMobile();
         }

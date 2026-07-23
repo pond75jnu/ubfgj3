@@ -485,6 +485,23 @@ img {
     box-shadow: 0 24px 70px rgba(15, 23, 42, 0.3);
 }
 
+.site-program-dialog.is-maximized {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+@supports (height: 100dvh) {
+    .site-program-dialog.is-maximized {
+        height: 100dvh !important;
+    }
+}
+
 .site-program-header {
     display: flex;
     align-items: start;
@@ -494,6 +511,10 @@ img {
     padding: 16px 18px 14px;
     cursor: move;
     user-select: none;
+}
+
+.site-program-dialog.is-maximized .site-program-header {
+    cursor: zoom-out;
 }
 
 .site-program-kicker {
@@ -581,6 +602,10 @@ img {
 
 .site-program-dialog .ui-resizable-handle {
     z-index: 3;
+}
+
+.site-program-dialog.is-maximized .ui-resizable-handle {
+    display: none !important;
 }
 
 .site-program-dialog .ui-resizable-se {
