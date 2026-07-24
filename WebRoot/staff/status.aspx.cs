@@ -33,6 +33,7 @@ public partial class staff_status : System.Web.UI.Page
         #endregion
 
         divStatusPage.Attributes["class"] = "site-panel site-status-page site-status-mode-" + hdMode.Value;
+        divRegistOptions.Visible = hdMode.Value.Equals("1");
 
         if (!Page.IsPostBack)
         {
@@ -104,6 +105,8 @@ public partial class staff_status : System.Web.UI.Page
 
     protected void GetStatusRegist()
     {
+        bool includeUnregistered = rblIncludeUnregistered.SelectedValue.Equals("Y");
+
         StringBuilder sb1 = new StringBuilder();
         string _html_tab = @"
                     <ul class='site-tabs'>
@@ -182,7 +185,8 @@ public partial class staff_status : System.Web.UI.Page
                 dsLst = EfStoredProcedure.ExecuteDataSet(
                     "ubfgj3.dbo.SP_status_regist_get_members",
                     new SqlParameter("@RETREAT", ddl_retreat.SelectedValue),
-                    new SqlParameter("@BELONG", ds.Tables[0].Rows[i]["belong_nm"].ToString().Trim().Equals("0") ? (object)DBNull.Value : ds.Tables[0].Rows[i]["seq"].ToString().Trim()));
+                    new SqlParameter("@BELONG", ds.Tables[0].Rows[i]["belong_nm"].ToString().Trim().Equals("0") ? (object)DBNull.Value : ds.Tables[0].Rows[i]["seq"].ToString().Trim()),
+                    new SqlParameter("@INCLUDE_UNREGISTERED", SqlDbType.Bit) { Value = includeUnregistered });
 
 
                 _html_contents = _html_contents + "<div class='site-status-summary-cell'>";
@@ -797,6 +801,11 @@ public partial class staff_status : System.Web.UI.Page
             GetStatusPay();
         else
             GetAttends();
+    }
+
+    protected void rblIncludeUnregistered_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GetStatusRegist();
     }
 
     protected void gvList_RowDataBound(object sender, GridViewRowEventArgs e)

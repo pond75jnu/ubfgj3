@@ -16,6 +16,12 @@
 
 2026-06-29 기준으로 완료된 마이그레이션과 UI 정비 내역이다.
 
+### 등록현황 미등록 포함 여부 선택 (2026-07-24)
+
+- `/staff/status`의 등록현황 탭에 `미등록 제외`, `미등록 포함` 가로형 선택 옵션을 추가했다.
+- 기본값은 `미등록 제외`이며, 선택값은 전체 및 각 요회별 등록 통계에 동일하게 적용된다.
+- `SP_status_regist_get_members`의 `@INCLUDE_UNREGISTERED BIT = 0` 파라미터가 납부액이 없거나 `0원 이하`인 미등록 구성원의 포함 여부를 결정한다.
+
 ### 1. Bootstrap 제거 및 Tailwind 로컬 CSS 전환
 
 - `migration_plan.md`의 방향대로 Bootstrap 기반 공통 레이아웃을 Tailwind 기반 구조로 전환했다.

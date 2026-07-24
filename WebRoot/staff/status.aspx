@@ -94,6 +94,49 @@
             box-shadow: 0 1px 2px rgba(17, 24, 39, 0.12);
         }
 
+        .site-status-regist-options {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            border-top: 1px solid #e6eaf1;
+            padding: 10px 14px;
+            background: #f8fafc;
+        }
+
+        .site-status-regist-options-label {
+            color: #374151;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        .site-status-radio-list {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px 18px;
+        }
+
+        .site-status-radio-list input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            margin: 0 6px 0 0;
+            accent-color: #0057ff;
+            vertical-align: middle;
+        }
+
+        .site-status-radio-list label {
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            color: #111827;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.25;
+            cursor: pointer;
+        }
+
         .site-status-content {
             margin-top: 0 !important;
             border-top: 0;
@@ -351,6 +394,18 @@
                         </div>
                     </div>
                     <div id="divTab" runat="server" class="site-status-tabs">
+                    </div>
+                    <div id="divRegistOptions" runat="server" class="site-status-regist-options" visible="false">
+                        <span class="site-status-regist-options-label">집계 기준</span>
+                        <asp:RadioButtonList ID="rblIncludeUnregistered" runat="server"
+                            CssClass="site-status-radio-list"
+                            RepeatDirection="Horizontal"
+                            RepeatLayout="Flow"
+                            AutoPostBack="true"
+                            OnSelectedIndexChanged="rblIncludeUnregistered_SelectedIndexChanged">
+                            <asp:ListItem Value="N" Selected="True">미등록 제외</asp:ListItem>
+                            <asp:ListItem Value="Y">미등록 포함</asp:ListItem>
+                        </asp:RadioButtonList>
                     </div>
                     <div id="divContents" runat="server" class="site-status-content site-status-summary-board" visible="false">
                     </div>
