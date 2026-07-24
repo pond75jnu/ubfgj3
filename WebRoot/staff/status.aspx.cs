@@ -106,6 +106,9 @@ public partial class staff_status : System.Web.UI.Page
     protected void GetStatusRegist()
     {
         bool includeUnregistered = rblIncludeUnregistered.SelectedValue.Equals("Y");
+        string _html_unregistered_header = includeUnregistered
+            ? "<th class='nowrap txt_center'>미등록</th>"
+            : string.Empty;
 
         StringBuilder sb1 = new StringBuilder();
         string _html_tab = @"
@@ -285,6 +288,19 @@ public partial class staff_status : System.Web.UI.Page
                 }
                 #endregion
 
+                string _html_reader_unregistered = includeUnregistered
+                    ? "<td class='nowrap txt_center'>" + _str_reader_N + "</td>"
+                    : string.Empty;
+                string _html_lamb_unregistered = includeUnregistered
+                    ? "<td class='nowrap txt_center'>" + _str_lamb_N + "</td>"
+                    : string.Empty;
+                string _html_total_unregistered = includeUnregistered
+                    ? "<td class='nowrap txt_center'>" + _str_total_N + "</td>"
+                    : string.Empty;
+                string _html_total_unregistered_strong = includeUnregistered
+                    ? "<td class='nowrap txt_center'><strong>" + _str_total_N + "</strong></td>"
+                    : string.Empty;
+
                 #region 등록현환 html
 
                 if (ds.Tables[0].Rows[i]["belong_nm"].ToString().Trim().Equals("0"))
@@ -319,9 +335,7 @@ public partial class staff_status : System.Web.UI.Page
                                 <th class='nowrap txt_center'>
                                     부분등록
                                 </th>
-                                <th class='nowrap txt_center'>
-                                    미등록
-                                </th>
+                                " + _html_unregistered_header + @"
                             </tr>
                         </thead>
                         <tbody>
@@ -338,9 +352,7 @@ public partial class staff_status : System.Web.UI.Page
                                 <td class='nowrap txt_center'>
                                     " + _str_reader_P + @"
                                 </td>
-                                <td class='nowrap txt_center'>
-                                    " + _str_reader_N + @"
-                                </td>
+                                " + _html_reader_unregistered + @"
                             </tr>
                             <tr>
                                 <td class='nowrap txt_center'>
@@ -355,9 +367,7 @@ public partial class staff_status : System.Web.UI.Page
                                 <td class='nowrap txt_center'>
                                     " + _str_lamb_P + @"
                                 </td>
-                                <td class='nowrap txt_center'>
-                                    " + _str_lamb_N + @"
-                                </td>
+                                " + _html_lamb_unregistered + @"
                             </tr>
                            ";
                 if (ds.Tables[0].Rows[i]["belong_nm"].ToString().Trim().Equals("0"))
@@ -375,9 +385,7 @@ public partial class staff_status : System.Web.UI.Page
                                 <td class='nowrap txt_center'>
                                     <strong>" + _str_total_P + @"</strong>
                                 </td>
-                                <td class='nowrap txt_center'>
-                                    <strong>" + _str_total_N + @"</strong>
-                                </td>
+                                " + _html_total_unregistered_strong + @"
                             </tr>
                         </tbody>
                     </table>
@@ -399,9 +407,7 @@ public partial class staff_status : System.Web.UI.Page
                                 <td class='nowrap txt_center'>
                                     " + _str_total_P + @"
                                 </td>
-                                <td class='nowrap txt_center'>
-                                    " + _str_total_N + @"
-                                </td>
+                                " + _html_total_unregistered + @"
                             </tr>
                         </tbody>
                     </table>
