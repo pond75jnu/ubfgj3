@@ -18,7 +18,10 @@ BEGIN
                 WHEN usertype <> 3 AND ISNULL(etc2, N'N') = N'A' THEN 'reader_full_attend'
                 WHEN usertype <> 3 AND ISNULL(etc2, N'N') = N'P' THEN 'reader_part_attend'
                 WHEN usertype <> 3 AND ISNULL(etc2, N'N') = N'N' THEN 'reader_not_attend'
-           END AS attend_type
+           END AS attend_type,
+           CASE WHEN UPPER(LTRIM(RTRIM(gender))) = 'M' THEN 'M'
+                WHEN UPPER(LTRIM(RTRIM(gender))) = 'F' THEN 'F'
+                ELSE '' END AS gender
       FROM ubfgj3.dbo.group_members
      WHERE retreat = @RETREAT
        AND (@BELONG IS NULL OR belong = @BELONG);

@@ -239,7 +239,8 @@ public partial class group_usermanage : System.Web.UI.Page
                     _members = _members + ds.Tables[0].Rows[i]["seq"].ToString().Trim() + "‡";
                     _members = _members + ds.Tables[0].Rows[i]["regi_status"].ToString().Trim() + "‡";
                     _members = _members + ds.Tables[0].Rows[i]["attend"].ToString().Trim() + "‡";
-                    _members = _members + ds.Tables[0].Rows[i]["manager_confirm_first"].ToString().Trim() + "†";
+                    _members = _members + ds.Tables[0].Rows[i]["manager_confirm_first"].ToString().Trim() + "‡";
+                    _members = _members + ds.Tables[0].Rows[i]["gender"].ToString().Trim() + "†";
                 }
 
                 _members_string_length = _members.Length;
@@ -380,12 +381,16 @@ public partial class group_usermanage : System.Web.UI.Page
                 string _save_data_type_03 = _save_data_types[2];
                 string _save_data_type_04 = _save_data_types[3];
                 string _save_data_type_05 = _save_data_types[4];
+                string _save_data_type_06 = _save_data_types.Length > 5 ? _save_data_types[5] : string.Empty;
 
                 string _save_data_type_01_real = _save_data_type_01.Substring(0, _save_data_type_01.Length - 1);
                 string _save_data_type_02_real = _save_data_type_02.Substring(0, _save_data_type_02.Length - 1);
                 string _save_data_type_03_real = _save_data_type_03.Substring(0, _save_data_type_03.Length - 1);
                 string _save_data_type_04_real = _save_data_type_04.Substring(0, _save_data_type_04.Length - 1);
                 string _save_data_type_05_real = _save_data_type_05.Substring(0, _save_data_type_05.Length - 1);
+                string _save_data_type_06_real = _save_data_type_06.Equals(string.Empty)
+                    ? string.Empty
+                    : _save_data_type_06.Substring(0, _save_data_type_06.Length - 1);
 
                 string[] _save_row = _save_data_type_01_real.Split('#');
                 string[] _save_col = null;
@@ -394,6 +399,9 @@ public partial class group_usermanage : System.Web.UI.Page
                 string[] _save_duestype = _save_data_type_03_real.Split('‡');
                 string[] _save_howtoregist = _save_data_type_04_real.Split('‡');
                 string[] _save_attend = _save_data_type_05_real.Split('‡');
+                string[] _save_gender = _save_data_type_06_real.Equals(string.Empty)
+                    ? new string[_save_row.Length]
+                    : _save_data_type_06_real.Split('‡');
 
                 string _save_nm = string.Empty;
                 int _save_dues = 0;
@@ -403,6 +411,7 @@ public partial class group_usermanage : System.Web.UI.Page
                 string _save_duestype_value = string.Empty;
                 string _save_howtoregist_value = string.Empty;
                 string _save_attend_value = string.Empty;
+                string _save_gender_value = string.Empty;
 
                 string _manage_confirm = _auth.ToLower().Equals("admin") || _auth.ToLower().Equals("manager") ? "Y" : "N";
 
@@ -424,6 +433,14 @@ public partial class group_usermanage : System.Web.UI.Page
                     _save_duestype_value = _save_duestype[i].Trim();
                     _save_howtoregist_value = _save_howtoregist[i].Trim();
                     _save_attend_value = _save_attend[i].Trim();
+                    _save_gender_value = _save_gender[i].Trim().ToUpperInvariant();
+
+                    if (!_save_gender_value.Equals(string.Empty)
+                        && !_save_gender_value.Equals("M")
+                        && !_save_gender_value.Equals("F"))
+                    {
+                        throw new ArgumentException("성별 값이 올바르지 않습니다.");
+                    }
 
                     _manage_confirm = (_auth.ToLower().Equals("admin") || _auth.ToLower().Equals("manager")) && _save_dues > 0 ? "Y" : "N";
 
@@ -435,6 +452,7 @@ public partial class group_usermanage : System.Web.UI.Page
                             "ubfgj3.dbo.SP_group_member_save",
                             new SqlParameter("@SEQ", DBNull.Value),
                             new SqlParameter("@USER_NM", _save_nm),
+                            new SqlParameter("@GENDER", SqlDbType.Char, 1) { Value = _save_gender_value.Equals(string.Empty) ? (object)DBNull.Value : _save_gender_value },
                             new SqlParameter("@BELONG", ddl_group.SelectedValue),
                             new SqlParameter("@RETREAT", ddl_retreat.SelectedValue),
                             new SqlParameter("@USERTYPE", _save_usertype_value),
@@ -461,6 +479,7 @@ public partial class group_usermanage : System.Web.UI.Page
                             "ubfgj3.dbo.SP_group_member_save",
                             new SqlParameter("@SEQ", _save_seq),
                             new SqlParameter("@USER_NM", _save_nm),
+                            new SqlParameter("@GENDER", SqlDbType.Char, 1) { Value = _save_gender_value.Equals(string.Empty) ? (object)DBNull.Value : _save_gender_value },
                             new SqlParameter("@BELONG", ddl_group.SelectedValue),
                             new SqlParameter("@RETREAT", ddl_retreat.SelectedValue),
                             new SqlParameter("@USERTYPE", _save_usertype_value),

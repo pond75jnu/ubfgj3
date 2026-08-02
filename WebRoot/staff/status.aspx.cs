@@ -109,6 +109,7 @@ public partial class staff_status : System.Web.UI.Page
         string _html_unregistered_header = includeUnregistered
             ? "<th class='nowrap txt_center'>미등록</th>"
             : string.Empty;
+        string _gender_colspan = includeUnregistered ? "4" : "3";
 
         StringBuilder sb1 = new StringBuilder();
         string _html_tab = @"
@@ -150,6 +151,9 @@ public partial class staff_status : System.Web.UI.Page
         int _all_p_regi = 0;
         int _all_c_regi = 0;
         int _all_n_regi = 0;
+        int _gender_male = 0;
+        int _gender_female = 0;
+        int _gender_unknown = 0;
 
         string _str_reader_all = string.Empty;
         string _str_reader_C = string.Empty;
@@ -203,6 +207,14 @@ public partial class staff_status : System.Web.UI.Page
                             _reader = _reader + 1;
                         else
                             _lamb = _lamb + 1;
+
+                        string gender = dsLst.Tables[0].Rows[j]["gender"].ToString();
+                        if (gender.Equals("M"))
+                            _gender_male = _gender_male + 1;
+                        else if (gender.Equals("F"))
+                            _gender_female = _gender_female + 1;
+                        else
+                            _gender_unknown = _gender_unknown + 1;
 
                         if (dsLst.Tables[0].Rows[j]["regi_type"].ToString().Equals("lamb_complete"))
                             _lamb_c_regi = _lamb_c_regi + 1;
@@ -387,6 +399,14 @@ public partial class staff_status : System.Web.UI.Page
                                 </td>
                                 " + _html_total_unregistered_strong + @"
                             </tr>
+                            <tr class='site-summary-gender'>
+                                <td class='nowrap txt_center'><strong>성별</strong></td>
+                                <td class='txt_center' colspan='" + _gender_colspan + @"'>
+                                    <span>남 " + _gender_male.ToString() + @"명</span>
+                                    <span>여 " + _gender_female.ToString() + @"명</span>
+                                    <span>미확인 " + _gender_unknown.ToString() + @"명</span>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -408,6 +428,14 @@ public partial class staff_status : System.Web.UI.Page
                                     " + _str_total_P + @"
                                 </td>
                                 " + _html_total_unregistered + @"
+                            </tr>
+                            <tr class='site-summary-gender'>
+                                <td class='nowrap txt_center'><strong>성별</strong></td>
+                                <td class='txt_center' colspan='" + _gender_colspan + @"'>
+                                    <span>남 " + _gender_male.ToString() + @"명</span>
+                                    <span>여 " + _gender_female.ToString() + @"명</span>
+                                    <span>미확인 " + _gender_unknown.ToString() + @"명</span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -434,6 +462,9 @@ public partial class staff_status : System.Web.UI.Page
                 _all_p_regi = 0;
                 _all_c_regi = 0;
                 _all_n_regi = 0;
+                _gender_male = 0;
+                _gender_female = 0;
+                _gender_unknown = 0;
             }
 
             _html_contents = _html_contents + "</div>";
@@ -545,6 +576,9 @@ public partial class staff_status : System.Web.UI.Page
         int _all = 0;
         int _all_p_regi = 0;
         int _all_c_regi = 0;
+        int _gender_male = 0;
+        int _gender_female = 0;
+        int _gender_unknown = 0;
 
         string _str_reader_all = string.Empty;
         string _str_reader_C = string.Empty;
@@ -590,14 +624,30 @@ public partial class staff_status : System.Web.UI.Page
                 {
                     for (int j = 0; j < dsLst.Tables[0].Rows.Count; j++)
                     {
-                        if (dsLst.Tables[0].Rows[j]["attend_type"].ToString().Equals("lamb_full_attend"))
+                        string attendType = dsLst.Tables[0].Rows[j]["attend_type"].ToString();
+
+                        if (attendType.Equals("lamb_full_attend"))
                             _lamb_c_regi = _lamb_c_regi + 1;
-                        else if (dsLst.Tables[0].Rows[j]["attend_type"].ToString().Equals("reader_full_attend"))
+                        else if (attendType.Equals("reader_full_attend"))
                             _reader_c_regi = _reader_c_regi + 1;
-                        else if (dsLst.Tables[0].Rows[j]["attend_type"].ToString().Equals("lamb_part_attend"))
+                        else if (attendType.Equals("lamb_part_attend"))
                             _lamb_p_regi = _lamb_p_regi + 1;
-                        else if (dsLst.Tables[0].Rows[j]["attend_type"].ToString().Equals("reader_part_attend"))
+                        else if (attendType.Equals("reader_part_attend"))
                             _reader_p_regi = _reader_p_regi + 1;
+
+                        if (attendType.Equals("lamb_full_attend")
+                            || attendType.Equals("reader_full_attend")
+                            || attendType.Equals("lamb_part_attend")
+                            || attendType.Equals("reader_part_attend"))
+                        {
+                            string gender = dsLst.Tables[0].Rows[j]["gender"].ToString();
+                            if (gender.Equals("M"))
+                                _gender_male = _gender_male + 1;
+                            else if (gender.Equals("F"))
+                                _gender_female = _gender_female + 1;
+                            else
+                                _gender_unknown = _gender_unknown + 1;
+                        }
                     }
 
                     _reader = _reader_c_regi + _reader_p_regi;
@@ -745,6 +795,14 @@ public partial class staff_status : System.Web.UI.Page
                                     <strong>" + _str_total_P + @"</strong>
                                 </td>
                             </tr>
+                            <tr class='site-summary-gender'>
+                                <td class='nowrap txt_center'><strong>성별</strong></td>
+                                <td class='txt_center' colspan='3'>
+                                    <span>남 " + _gender_male.ToString() + @"명</span>
+                                    <span>여 " + _gender_female.ToString() + @"명</span>
+                                    <span>미확인 " + _gender_unknown.ToString() + @"명</span>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -764,6 +822,14 @@ public partial class staff_status : System.Web.UI.Page
                                 </td>
                                 <td class='nowrap txt_center'>
                                     " + _str_total_P + @"
+                                </td>
+                            </tr>
+                            <tr class='site-summary-gender'>
+                                <td class='nowrap txt_center'><strong>성별</strong></td>
+                                <td class='txt_center' colspan='3'>
+                                    <span>남 " + _gender_male.ToString() + @"명</span>
+                                    <span>여 " + _gender_female.ToString() + @"명</span>
+                                    <span>미확인 " + _gender_unknown.ToString() + @"명</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -788,6 +854,9 @@ public partial class staff_status : System.Web.UI.Page
                 _all = 0;
                 _all_p_regi = 0;
                 _all_c_regi = 0;
+                _gender_male = 0;
+                _gender_female = 0;
+                _gender_unknown = 0;
             }
 
             _html_contents = _html_contents + "</div>";

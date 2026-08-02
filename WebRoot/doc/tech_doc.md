@@ -14,7 +14,19 @@
 
 ## 현재까지 작업 내역
 
-2026-06-29 기준으로 완료된 마이그레이션과 UI 정비 내역이다.
+2026-08-02 기준으로 완료된 마이그레이션과 UI 정비 내역이다.
+
+### 구성원 성별 등록 및 참석현황 성별 집계 (2026-08-02)
+
+- `/group/usermanage`의 이름 옆에 `성별` 선택 열을 추가했다.
+- 선택값은 `성별선택=''`, `남자='M'`, `여자='F'`이며 `group_members.gender CHAR(1) NULL`에 저장한다.
+- 기존 구성원의 성별은 NULL이므로 최초 조회 시 `성별선택`으로 표시한다.
+- DB의 `CK_group_members_gender` 제약조건과 `SP_group_member_save`가 `M`, `F`, NULL만 허용한다.
+- 이전 수양회 구성원 이관 시 저장된 성별이 있으면 함께 이관한다.
+- `/staff/status?mode=3`의 각 요회와 전체 참석현황 표에 완전참석·부분참석 인원을 기준으로 `남`, `여`, `미확인` 성별 집계를 표시한다.
+- `/staff/status?mode=1`의 등록현황 표에도 현재 미등록 포함 여부를 반영한 `남`, `여`, `미확인` 성별 집계를 표시한다.
+- 성별이 NULL 또는 빈값인 참석자는 `미확인`으로 집계한다.
+- DB migration은 `DB/Migration/20260802_group_member_gender_*` 파일로 관리한다.
 
 ### 등록현황 미등록 포함 여부 선택 (2026-07-24)
 
@@ -22,13 +34,14 @@
 - 기본값은 `미등록 제외`이며, 선택값은 전체 및 각 요회별 등록 통계에 동일하게 적용된다.
 - `미등록 제외`에서는 전체 및 각 요회별 표의 `미등록` 열 자체를 숨기고, `미등록 포함`에서만 해당 열을 표시한다.
 - `SP_status_regist_get_members`의 `@INCLUDE_UNREGISTERED BIT = 0` 파라미터가 납부액이 없거나 `0원 이하`인 미등록 구성원의 포함 여부를 결정한다.
+- 등록현황의 각 요회와 전체 표에도 현재 `미등록 제외/포함` 조건으로 조회된 구성원을 기준으로 `남`, `여`, `미확인` 성별 집계를 표시한다.
 
 ### 1. Bootstrap 제거 및 Tailwind 로컬 CSS 전환
 
 - `migration_plan.md`의 방향대로 Bootstrap 기반 공통 레이아웃을 Tailwind 기반 구조로 전환했다.
 - `WebRoot/master/master_main.master`에서 Bootstrap CSS/JS와 Bootstrap Icons 의존 로드를 제거했다.
 - Tailwind CDN 런타임은 사용하지 않고, `DESIGN.md` 기준 토큰으로 생성한 로컬 CSS `WebRoot/common/css/tailwind.css`를 로드한다.
-- 현재 공통 CSS/JS 캐시 버전은 `tailwind.css?v=tailwind-02`, `custom.css?v=tailwind-52`, `custom.js?v=tailwind-25`이다.
+- 현재 공통 CSS/JS 캐시 버전은 `tailwind.css?v=tailwind-02`, `custom.css?v=tailwind-52`, `custom.js?v=tailwind-26`이다.
 - Pretendard GOV 고정(static) dynamic subset 웹폰트를 사용한다.
 - `custom.css`는 `DESIGN.md`의 Action Blue, hairline border, neutral background, restrained radius 원칙을 기준으로 공통 화면을 보정한다.
 - Web Forms 기존 화면에 남아 있는 `btn`, `form-control`, `form-select`, `table`, `card`, `badge`, `alert` 계열 클래스는 공통 CSS에서 호환 스타일로 흡수한다.
@@ -393,6 +406,7 @@ ASP.NET Membership/Role Provider는 `RetreatConnectionString` 이름을 계속 �
 - 서버가 기존 구성원을 hidden field에 `†`, `‡` 구분 문자열로 내려준다.
 - `custom.js`의 `set_table_usermanage()`가 HTML 테이블 행을 만든다.
 - 저장 시 `save_members_table()`이 테이블 내용을 다시 hidden field `hdSaveMembers`에 직렬화한다.
+- 성별은 hidden field 직렬화의 여섯 번째 선택값 묶음으로 저장하며 빈값, `M`, `F`만 허용한다.
 - 서버의 `btnSave_Click()`이 문자열을 분해해 `group_members`를 insert/update/delete 한다.
 - 저장된 seq 목록에 없는 기존 행은 삭제된다.
 - 단, 일반 `user`는 실무 확인된 행을 삭제하지 못하도록 조건이 있다.
@@ -535,7 +549,7 @@ ASP.NET Membership/Role Provider는 `RetreatConnectionString` 이름을 계속 �
 | 수양회 | `retreat_master` | 수양회 기본정보, 기간, 장소, 사용여부, 안내 첨부파일, 납부 계좌 관리 | `seq`, `retreat_name`, `retreat_place`, `retreat_desc`, `retreat_sdt`, `retreat_edt`, `retreat_yn`, `file_nm`, `file_type`, `file_size`, `file_data`, `etc1` | `SP_retreat_*`, `SP_staff_retreat_get_list`, `SP_manage_retreat_recent_sel` |
 | 회비 | `retreatdues_master` | 수양회별 회비 구분과 금액 관리. 구성원 등록과 등록현황 계산의 기준 | `seq`, `retreat`, `dues_nm`, `dues`, `dues_desc`, audit 컬럼 | `SP_retreatdues_*`, `SP_staff_retreatdues_*`, `SP_retreat_dues_by_retreat_sel` |
 | 요회 | `groups` | 수양회별 요회, 요회목자, 사용여부 관리. 현재 수양회에 목록이 없으면 이전 수양회 목록을 복사 | `seq`, `belong_nm`, `manager`, `retreat`, `etc1`, audit 컬럼 | `SP_group_*`, `SP_groups_*`, `SP_manage_group_*` |
-| 구성원/등록 | `group_members` | 요회 구성원, 회원구분, 회비구분, 납부금액, 실무확인, 참석여부 관리 | `seq`, `user_nm`, `belong`, `retreat`, `usertype`, `duestype`, `user_dues`, `howto_regist`, `user_desc`, `manager_confirm`, `etc1`, `etc2`, audit 컬럼 | `SP_group_members_*`, `SP_group_member_save`, `SP_registatus_*`, `SP_status_*` |
+| 구성원/등록 | `group_members` | 요회 구성원, 성별, 회원구분, 회비구분, 납부금액, 실무확인, 참석여부 관리 | `seq`, `user_nm`, `gender`, `belong`, `retreat`, `usertype`, `duestype`, `user_dues`, `howto_regist`, `user_desc`, `manager_confirm`, `etc1`, `etc2`, audit 컬럼 | `SP_group_members_*`, `SP_group_member_save`, `SP_registatus_*`, `SP_status_*` |
 | 사이트 회원 | `member_master` | Membership 계정과 별도로 관리하는 사용자 프로필. 로그인 ID, 이름, 소속 요회, 이메일 저장 | `login_id`, `kor_nm`, `belong`, `belong_nm`, `email`, audit 컬럼 | `SP_member_*`, `SP_manage_member_*`, `SP_userinfo_*` |
 | 메뉴/권한 | `menu_master` | 상단/좌측 메뉴, breadcrumb, 페이지 접근권한 제어 | `seq`, `parent_seq`, `menu_nm`, `menu_path`, `menu_depth`, `menu_order`, `menu_auth` | `SP_menu_*` |
 | 수입/지출 코드 | `cash_item_master` | 수양회와 무관한 전체 공통 수입/지출 코드 관리. `retreat` 컬럼은 기존 스키마 호환용 값 | `seq`, `retreat`, `cash_type`, `item_nm`, `item_desc`, audit 컬럼 | `SP_staff_cash_item_*` |
@@ -567,6 +581,7 @@ ASP.NET Membership/Role Provider는 `RetreatConnectionString` 이름을 계속 �
 - `retreat_master.retreat_yn='Y'`: 현재 사용 중인 수양회
 - `groups.etc1='Y'`: 사용 중인 요회
 - `group_members.usertype`: `1=목자`, `2=목동`, `3=양`
+- `group_members.gender`: `M=남자`, `F=여자`, `NULL/빈값=미확인`
 - `group_members.howto_regist`: `1=계좌이체`, `2=현금납부`
 - `group_members.manager_confirm`: 실무자 회비 확인 여부 `Y/N`
 - `group_members.etc1`: 최초 확인 또는 재확인 표시
@@ -597,7 +612,7 @@ SP 소스는 `DB/StoredProcedure` 아래에 관리한다. 개별 SP 파일은 `C
 
 현재 현황:
 
-- 개별 SP 소스: 89개
+- 개별 SP 소스: 99개
 - 통합 실행 스크립트: `All_SP_LIST.sql`
 - SQL 프로젝트 항목: 각 `.sql` 파일을 `None Include`로 명시 등록
 - 솔루션 빌드: DB 프로젝트는 빌드/배포 대상에서 제외
@@ -613,6 +628,7 @@ SP 소스는 `DB/StoredProcedure` 아래에 관리한다. 개별 SP 파일은 `C
 | 메뉴/권한 | 7 | `SP_menu_*` | 상단 메뉴, 좌측 메뉴, breadcrumb, 페이지 권한 조회 |
 | 수입/지출 | 16 | `SP_staff_cash_item_*`, `SP_staff_payment_*`, `SP_payment_*`, `SP_income_summary_sel` | 수입/지출 코드 CRUD, 결제 CRUD, 요약/인쇄 상세 |
 | 실무확인/현황 | 7 | `SP_registatus_*`, `SP_regist_info_sel`, `SP_status_*` | 등록현황, 실무확인 저장, 참석/등록 통계 |
+| 식사 사전조사 | 10 | `SP_meal_*` | 접근 제한, 제공 설정, 공개 조사 저장, 실무자 현황/상세 |
 
 운영 DB 기존 정의에 계속 의존하는 SP:
 

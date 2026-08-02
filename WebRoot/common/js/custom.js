@@ -1380,6 +1380,7 @@ function set_table_usermanage() {
 
     var _tr_contents;
     var _usertype_contents;
+    var _gender_contents;
     var _duestype_contents;
     var _regitype_contents;
 
@@ -1406,6 +1407,7 @@ function set_table_usermanage() {
 
     _tr_contents = "";
     _usertype_contents = "";
+    _gender_contents = "";
     _duestype_contents = "";
     _regitype_contents = "";
 
@@ -1418,8 +1420,8 @@ function set_table_usermanage() {
 
             _members_item = _members_row[i].split("‡");
 
-            //_members_item[7] : manager_confirm, _members_item[10] : manager_confirm_first
-            if ((_members_item[7] == 'Y' || _members_item[10] == 'Y') && _user_role == 'user') 
+            //_members_item[7] : manager_confirm, _members_item[11] : manager_confirm_first
+            if ((_members_item[7] == 'Y' || _members_item[11] == 'Y') && _user_role == 'user')
                 _delete_button = "<input type='button' class='site-button site-button-dark site-button-sm site-grid-delete-button' value='행삭제' disabled onclick=\"remove_tr(this);\" />";
             else
                 _delete_button = "<input type='button' class='site-button site-button-dark site-button-sm site-grid-delete-button' value='행삭제' onclick=\"remove_tr(this);\" />";
@@ -1430,6 +1432,23 @@ function set_table_usermanage() {
             + "<td class='nowrap'>"
             + "<input type='text' class='ui-input ui-input-sm' value='" + _members_item[0] + "' style='width:76px;' />" //_members_item[0] : 성명
             + "</td>"
+
+            /////// 성별
+            + "<td class='nowrap'>";
+            _gender_contents = "<select name='ddl_gender' class='ui-select ui-select-sm' style='width:auto;'>";
+            _gender_contents += _members_item[12] == ''
+                ? "<option selected='selected' value=''>성별선택</option>"
+                : "<option value=''>성별선택</option>";
+            _gender_contents += _members_item[12] == 'M'
+                ? "<option selected='selected' value='M'>남자</option>"
+                : "<option value='M'>남자</option>";
+            _gender_contents += _members_item[12] == 'F'
+                ? "<option selected='selected' value='F'>여자</option>"
+                : "<option value='F'>여자</option>";
+            _gender_contents += "</select>";
+
+            _tr_contents += _gender_contents;
+            _tr_contents += "</td>"
 
             /////// 사용자구분코드
             + "<td class='nowrap'>";
@@ -1605,14 +1624,14 @@ function updateUsermanageRegistStatus(obj) {
         return;
     }
 
-    var payment = parseUsermanageAmount($row.children("td").eq(3).find("input[type='text']").val());
+    var payment = parseUsermanageAmount($row.children("td").eq(4).find("input[type='text']").val());
     var status = getUsermanageRegistStatus(payment, dues);
 
     $row
         .removeClass("table-success table-warning table-danger bd-green-100 bd-yellow-100 bd-red-100")
         .addClass(status.className);
 
-    $row.children("td").eq(5).find("input[type='text']").val(status.memo);
+    $row.children("td").eq(6).find("input[type='text']").val(status.memo);
 }
 
 function inputOnlyNumberFormat(obj) {
@@ -1661,6 +1680,15 @@ function add_member_tr() {
         //성명
         + "<td class='nowrap'>"
         + "<input type='text' class='ui-input ui-input-sm' style='width:76px;' />"
+        + "</td>"
+
+        //성별
+        + "<td class='nowrap'>"
+        + "<select name='ddl_gender' class='ui-select ui-select-sm' style='width:auto;'>"
+        + "<option value=''>성별선택</option>"
+        + "<option value='M'>남자</option>"
+        + "<option value='F'>여자</option>"
+        + "</select>"
         + "</td>"
 
         //사용자구분
@@ -1725,7 +1753,7 @@ function add_member_tr() {
     //alert(_duestype_contents);
 
     $(_tr_contents).appendTo('#tb_member');
-    updateUsermanageRegistStatus($("#tb_member tr:last-child").children("td").eq(3).find("input[type='text']")[0]);
+    updateUsermanageRegistStatus($("#tb_member tr:last-child").children("td").eq(4).find("input[type='text']")[0]);
 }
 
 function remove_tr(tr) {
@@ -1749,6 +1777,7 @@ function save_members_table() {
     var _duestype;
     var _regitype;
     var _attend;
+    var _gender;
 
     var _save_data;
 
@@ -1757,6 +1786,7 @@ function save_members_table() {
     _duestype = $("#tb_member tr td select[name=ddl_duestype] option:selected").length;
     _regitype = $("#tb_member tr td select[name=ddl_regitype] option:selected").length;
     _attend = $("#tb_member tr td select[name=ddl_attend] option:selected").length;
+    _gender = $("#tb_member tr td select[name=ddl_gender] option:selected").length;
 
     //alert(_duestype);
 
@@ -1788,6 +1818,12 @@ function save_members_table() {
 
         for (var n = 0; n < _attend; n++) {
             _save_data = _save_data + $("select[name=ddl_attend] option:selected").eq(n).val().trim() + "‡"
+        }
+
+        _save_data = _save_data + "†";
+
+        for (var p = 0; p < _gender; p++) {
+            _save_data = _save_data + $("select[name=ddl_gender] option:selected").eq(p).val().trim() + "‡"
         }
     }
     else {

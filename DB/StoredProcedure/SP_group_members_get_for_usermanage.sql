@@ -20,11 +20,11 @@ BEGIN
                 WHEN A.user_dues < B.dues AND A.user_dues > 0 THEN 'table-warning'
            END AS regi_status,
            ISNULL(A.etc1, N'N') AS manager_confirm_first,
-           ISNULL(A.etc2, N'N') AS attend
+           ISNULL(A.etc2, N'N') AS attend,
+           ISNULL(NULLIF(UPPER(LTRIM(RTRIM(A.gender))), N''), N'') AS gender
       FROM ubfgj3.dbo.group_members A
      INNER JOIN ubfgj3.dbo.retreatdues_master B ON B.seq = A.duestype
                                                AND B.retreat = A.retreat
      WHERE A.retreat = @RETREAT
        AND A.belong = @BELONG;
 END
-

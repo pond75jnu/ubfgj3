@@ -49,16 +49,25 @@ CREATE OR ALTER PROCEDURE dbo.SP_group_member_save
     @ATTEND NVARCHAR(300),
     @UID NVARCHAR(50),
     @UIP NVARCHAR(50),
-    @AUTH NVARCHAR(20)
+    @AUTH NVARCHAR(20),
+    @GENDER CHAR(1) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
+
+    SET @GENDER = NULLIF(UPPER(LTRIM(RTRIM(@GENDER))), '');
+
+    IF @GENDER IS NOT NULL AND @GENDER NOT IN ('M', 'F')
+    BEGIN
+        THROW 50001, N'성별 값은 M, F 또는 빈값이어야 합니다.', 1;
+    END
 
     IF @SEQ IS NULL
     BEGIN
         INSERT INTO ubfgj3.dbo.group_members
         (
             user_nm,
+            gender,
             belong,
             retreat,
             usertype,
@@ -77,6 +86,7 @@ BEGIN
             upt_dt
         )
         SELECT @USER_NM,
+               @GENDER,
                @BELONG,
                @RETREAT,
                @USERTYPE,
@@ -100,6 +110,7 @@ BEGIN
 
     UPDATE ubfgj3.dbo.group_members
        SET user_nm = @USER_NM,
+           gender = @GENDER,
            belong = @BELONG,
            retreat = @RETREAT,
            usertype = @USERTYPE,
@@ -298,7 +309,8 @@ BEGIN
                 WHEN A.user_dues < B.dues AND A.user_dues > 0 THEN 'table-warning'
            END AS regi_status,
            ISNULL(A.etc1, N'N') AS manager_confirm_first,
-           ISNULL(A.etc2, N'N') AS attend
+           ISNULL(A.etc2, N'N') AS attend,
+           ISNULL(NULLIF(UPPER(LTRIM(RTRIM(A.gender))), N''), N'') AS gender
       FROM ubfgj3.dbo.group_members A
      INNER JOIN ubfgj3.dbo.retreatdues_master B ON B.seq = A.duestype
                                                AND B.retreat = A.retreat
@@ -325,6 +337,7 @@ BEGIN
     INSERT INTO ubfgj3.dbo.group_members
     (
         user_nm,
+        gender,
         belong,
         retreat,
         usertype,
@@ -343,6 +356,9 @@ BEGIN
         upt_dt
     )
     SELECT A.user_nm,
+           CASE WHEN UPPER(LTRIM(RTRIM(A.gender))) IN ('M', 'F')
+                THEN UPPER(LTRIM(RTRIM(A.gender)))
+                ELSE NULL END AS gender,
            @BELONG AS belong,
            @RETREAT AS retreat,
            A.usertype,
@@ -3903,7 +3919,10 @@ BEGIN
                 WHEN usertype <> 3 AND ISNULL(etc2, N'N') = N'A' THEN 'reader_full_attend'
                 WHEN usertype <> 3 AND ISNULL(etc2, N'N') = N'P' THEN 'reader_part_attend'
                 WHEN usertype <> 3 AND ISNULL(etc2, N'N') = N'N' THEN 'reader_not_attend'
-           END AS attend_type
+           END AS attend_type,
+           CASE WHEN UPPER(LTRIM(RTRIM(gender))) = 'M' THEN 'M'
+                WHEN UPPER(LTRIM(RTRIM(gender))) = 'F' THEN 'F'
+                ELSE '' END AS gender
       FROM ubfgj3.dbo.group_members
      WHERE retreat = @RETREAT
        AND (@BELONG IS NULL OR belong = @BELONG);
@@ -3965,7 +3984,10 @@ BEGIN
                 WHEN ISNULL(A.user_dues, 0) <= 0 AND A.usertype <> 3 THEN 'reader_no_complete'
                 WHEN A.user_dues < B.dues AND A.user_dues > 0 AND A.usertype = 3 THEN 'lamb_p_complete'
                 WHEN A.user_dues < B.dues AND A.user_dues > 0 AND A.usertype <> 3 THEN 'reader_p_complete'
-           END AS regi_type
+           END AS regi_type,
+           CASE WHEN UPPER(LTRIM(RTRIM(A.gender))) = 'M' THEN 'M'
+                WHEN UPPER(LTRIM(RTRIM(A.gender))) = 'F' THEN 'F'
+                ELSE '' END AS gender
       FROM ubfgj3.dbo.group_members A
      INNER JOIN ubfgj3.dbo.retreatdues_master B ON B.seq = A.duestype
                                                AND B.retreat = A.retreat

@@ -12,6 +12,7 @@ BEGIN
     INSERT INTO ubfgj3.dbo.group_members
     (
         user_nm,
+        gender,
         belong,
         retreat,
         usertype,
@@ -30,6 +31,9 @@ BEGIN
         upt_dt
     )
     SELECT A.user_nm,
+           CASE WHEN UPPER(LTRIM(RTRIM(A.gender))) IN ('M', 'F')
+                THEN UPPER(LTRIM(RTRIM(A.gender)))
+                ELSE NULL END AS gender,
            @BELONG AS belong,
            @RETREAT AS retreat,
            A.usertype,
@@ -54,4 +58,3 @@ BEGIN
      WHERE A.belong = @BEFORE_BELONG
        AND A.retreat = @BEFORE_RETREAT;
 END
-

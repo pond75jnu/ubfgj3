@@ -12,16 +12,25 @@
     @ATTEND NVARCHAR(300),
     @UID NVARCHAR(50),
     @UIP NVARCHAR(50),
-    @AUTH NVARCHAR(20)
+    @AUTH NVARCHAR(20),
+    @GENDER CHAR(1) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
+
+    SET @GENDER = NULLIF(UPPER(LTRIM(RTRIM(@GENDER))), '');
+
+    IF @GENDER IS NOT NULL AND @GENDER NOT IN ('M', 'F')
+    BEGIN
+        THROW 50001, N'성별 값은 M, F 또는 빈값이어야 합니다.', 1;
+    END
 
     IF @SEQ IS NULL
     BEGIN
         INSERT INTO ubfgj3.dbo.group_members
         (
             user_nm,
+            gender,
             belong,
             retreat,
             usertype,
@@ -40,6 +49,7 @@ BEGIN
             upt_dt
         )
         SELECT @USER_NM,
+               @GENDER,
                @BELONG,
                @RETREAT,
                @USERTYPE,
@@ -63,6 +73,7 @@ BEGIN
 
     UPDATE ubfgj3.dbo.group_members
        SET user_nm = @USER_NM,
+           gender = @GENDER,
            belong = @BELONG,
            retreat = @RETREAT,
            usertype = @USERTYPE,
@@ -90,4 +101,3 @@ BEGIN
 
     SELECT @SEQ AS new_seq;
 END
-

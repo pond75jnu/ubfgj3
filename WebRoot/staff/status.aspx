@@ -214,6 +214,17 @@
             font-weight: 700;
         }
 
+        .site-status-summary-cell .site-summary-gender td[colspan] {
+            white-space: normal !important;
+        }
+
+        .site-status-summary-cell .site-summary-gender span {
+            display: inline-block;
+            margin: 1px 4px;
+            color: #374151;
+            font-weight: 600;
+        }
+
         .site-status-payment-board {
             overflow: hidden;
             background: #f8fafc;

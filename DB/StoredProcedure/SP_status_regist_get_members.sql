@@ -22,7 +22,10 @@ BEGIN
                 WHEN ISNULL(A.user_dues, 0) <= 0 AND A.usertype <> 3 THEN 'reader_no_complete'
                 WHEN A.user_dues < B.dues AND A.user_dues > 0 AND A.usertype = 3 THEN 'lamb_p_complete'
                 WHEN A.user_dues < B.dues AND A.user_dues > 0 AND A.usertype <> 3 THEN 'reader_p_complete'
-           END AS regi_type
+           END AS regi_type,
+           CASE WHEN UPPER(LTRIM(RTRIM(A.gender))) = 'M' THEN 'M'
+                WHEN UPPER(LTRIM(RTRIM(A.gender))) = 'F' THEN 'F'
+                ELSE '' END AS gender
       FROM ubfgj3.dbo.group_members A
      INNER JOIN ubfgj3.dbo.retreatdues_master B ON B.seq = A.duestype
                                                AND B.retreat = A.retreat

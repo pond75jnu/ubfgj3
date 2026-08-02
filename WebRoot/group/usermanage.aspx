@@ -58,7 +58,8 @@
                     
                     <table id="tb_member" class="site-data-table site-data-table-sm">
                         <tr>
-                            <th class='nowrap txt_center'>이름</th>                            
+                            <th class='nowrap txt_center'>이름</th>
+                            <th class='nowrap txt_center'>성별</th>
                             <th class='nowrap txt_center'>회원구분</th>
                             <th class='nowrap txt_center'>회비구분</th>
                             <th class='nowrap txt_center'>납부금액</th>
