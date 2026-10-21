@@ -34,7 +34,7 @@
                             <HeaderStyle CssClass="whitespace-nowrap bg-parchment text-center text-xs font-semibold text-ink" />
                             <Columns>
                                 <asp:TemplateField HeaderText="연번">
-                                    <ItemTemplate><%# Container.DataItemIndex + 1 %></ItemTemplate>
+                                    <ItemTemplate><%# TotalCount - Container.DataItemIndex %></ItemTemplate>
                                     <ItemStyle CssClass="whitespace-nowrap px-4 py-3 text-center" />
                                 </asp:TemplateField>
                                 <asp:BoundField DataField="retreat_year" HeaderText="연도" HtmlEncode="true">

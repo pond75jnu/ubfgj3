@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 public partial class staff_history : Page
 {
     private DataTable records;
+    protected int TotalCount { get; private set; }
 
     protected override void OnInit(EventArgs e)
     {
@@ -80,6 +81,7 @@ public partial class staff_history : Page
                 filtered.ImportRow(row);
         int lastPage = Math.Max(0, (filtered.Rows.Count - 1) / gvList.PageSize);
         gvList.PageIndex = Math.Min(gvList.PageIndex, lastPage);
+        TotalCount = filtered.Rows.Count;
         gvList.DataSource = filtered;
         gvList.DataBind();
         litCount.Text = "총 " + filtered.Rows.Count + "건 · 페이지당 15개";
