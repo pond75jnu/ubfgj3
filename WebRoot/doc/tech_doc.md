@@ -18,9 +18,10 @@
 
 - 실무자 메뉴 마지막의 `/staff/history`에서 전체 또는 연도·수양회별 실무자와 실무통장을 최근 수양회순으로 조회한다. 연도는 수양회 시작일 기준이며 현재 활성 수양회와 관계없이 조회한다.
 - 수정 기록이 없으면 `retreat_master.etc1`의 기존 입금계좌와 `예금주` 이름을 사용한다. 이름을 추출할 수 없거나 정보가 비어 있으면 `미등록`으로 표시한다.
-- `admin`, `manager`가 화면에 접근하고 기록을 수정할 수 있다. 수정값은 `retreat_staff_history`에 저장하며 기존 수양회 안내 계좌는 변경하지 않는다. 빈 값 저장은 해당 기록을 명시적으로 비우는 동작이다.
+- `admin`, `manager`가 접근하는 조회 전용 화면이다. 다른 실무자 화면과 동일한 `left_menu.ascx`를 사용하고, `manage/groups`와 같은 GridView 목록으로 연번·연도·수양회·기간·실무자·실무통장을 표시한다.
+- 페이지당 15개씩 표시하며 연도 또는 수양회 필터를 변경하면 첫 페이지로 돌아간다. 수정 폼과 저장 이벤트는 제공하지 않는다.
 - `DB/Migration/20261021_staff_history_schema.sql`로 테이블·메뉴를 생성하고 `SP_staff_history_get_list`, `SP_staff_history_save`를 적용한다. 웹 배포 파일은 `staff/history.aspx`, `staff/history.aspx.cs`, `common/css/staff-history.css`이다.
-- 저장 요청은 세션별 ViewState 검증 및 서버 권한 검사, SQL 매개변수를 사용한다. 조회 결과는 HTML 인코딩하여 출력한다.
+- 세션별 ViewState 검증 및 서버 권한 검사를 사용하고 조회 결과는 HTML 인코딩하여 출력한다. 기존 `SP_staff_history_save`는 이 화면에서 호출하지 않는다.
 
 2026-08-02 기준으로 완료된 마이그레이션과 UI 정비 내역이다.
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -53,7 +52,7 @@ public partial class staff_history : Page
                         ddlYear.Items.Add(new ListItem(year, year));
                 }
                 BindRetreats();
-                BindCards();
+                BindList();
             }
             catch (Exception ex) { ReportError(ex); }
         }
@@ -73,78 +72,45 @@ public partial class staff_history : Page
         return ddlYear.SelectedValue == "" || row["retreat_year"].ToString() == ddlYear.SelectedValue;
     }
 
-    private void BindCards()
+    private void BindList()
     {
         DataTable filtered = Records.Clone();
         foreach (DataRow row in Records.Rows)
             if (MatchesYear(row) && (ddlRetreat.SelectedValue == "" || row["seq"].ToString() == ddlRetreat.SelectedValue))
                 filtered.ImportRow(row);
-        rptHistory.DataSource = filtered;
-        rptHistory.DataBind();
-        litCount.Text = filtered.Rows.Count == 0 ? "등록된 수양회가 없습니다." : "총 " + filtered.Rows.Count + "개 수양회 · 최근 수양회순";
+        int lastPage = Math.Max(0, (filtered.Rows.Count - 1) / gvList.PageSize);
+        gvList.PageIndex = Math.Min(gvList.PageIndex, lastPage);
+        gvList.DataSource = filtered;
+        gvList.DataBind();
+        litCount.Text = "총 " + filtered.Rows.Count + "건 · 페이지당 15개";
+        if (filtered.Rows.Count > 0)
+            litCount.Text += " · " + (gvList.PageIndex + 1) + " / " + gvList.PageCount + " 페이지";
     }
 
     protected void YearChanged(object sender, EventArgs e)
     {
-        pnlEdit.Visible = false;
+        gvList.PageIndex = 0;
         lblMessage.Text = "";
-        try { BindRetreats(); BindCards(); }
+        try { BindRetreats(); BindList(); }
         catch (Exception ex) { ReportError(ex); }
     }
 
     protected void RetreatChanged(object sender, EventArgs e)
     {
-        pnlEdit.Visible = false;
+        gvList.PageIndex = 0;
         lblMessage.Text = "";
-        try { BindCards(); }
+        try { BindList(); }
         catch (Exception ex) { ReportError(ex); }
     }
 
-    protected void EditRecord(object sender, RepeaterCommandEventArgs e)
+    protected void PageChanged(object sender, GridViewPageEventArgs e)
     {
-        if (e.CommandName != "EditRecord") return;
-        try
-        {
-            foreach (DataRow row in Records.Rows)
-                if (row["seq"].ToString() == e.CommandArgument.ToString())
-                {
-                    hdRetreat.Value = row["seq"].ToString();
-                    litEditTitle.Text = row["retreat_name"].ToString();
-                    txtStaff.Text = row["staff_names"].ToString();
-                    txtBank.Text = row["bank_info"].ToString();
-                    pnlEdit.Visible = true;
-                    lblMessage.Text = "";
-                    txtStaff.Focus();
-                    break;
-                }
-        }
+        gvList.PageIndex = Math.Max(0, e.NewPageIndex);
+        lblMessage.Text = "";
+        try { BindList(); }
         catch (Exception ex) { ReportError(ex); }
     }
 
-    protected void Save(object sender, EventArgs e)
-    {
-        int seq;
-        if (!pnlEdit.Visible || !Int32.TryParse(hdRetreat.Value, out seq)) return;
-        if (txtStaff.Text.Trim().Length > 300 || txtBank.Text.Trim().Length > 300)
-        {
-            lblMessage.Text = "실무자와 실무통장은 각각 300자 이내로 입력해 주세요.";
-            return;
-        }
-        try
-        {
-            EfStoredProcedure.ExecuteNonQuery("dbo.SP_staff_history_save",
-                new SqlParameter("@RetreatSeq", seq),
-                new SqlParameter("@StaffNames", SqlDbType.NVarChar, 300) { Value = txtStaff.Text.Trim() },
-                new SqlParameter("@BankInfo", SqlDbType.NVarChar, 300) { Value = txtBank.Text.Trim() });
-            records = null;
-            BindCards();
-            pnlEdit.Visible = false;
-            lblMessage.Text = "실무자 및 실무통장 정보를 저장했습니다.";
-        }
-        catch (Exception ex) { ReportError(ex); }
-    }
-
-    protected void Cancel(object sender, EventArgs e) { pnlEdit.Visible = false; lblMessage.Text = ""; }
     protected string Display(object value) { return String.IsNullOrWhiteSpace(Convert.ToString(value)) ? "미등록" : Convert.ToString(value); }
     private void ReportError(Exception ex)
     {
